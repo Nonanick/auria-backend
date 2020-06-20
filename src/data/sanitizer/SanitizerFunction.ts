@@ -1,0 +1,1 @@
+export type SanitizerFunction<T = any> = (arg: any) => T;

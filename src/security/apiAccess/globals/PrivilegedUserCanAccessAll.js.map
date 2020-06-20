@@ -1,0 +1,1 @@
+{"version":3,"file":"PrivilegedUserCanAccessAll.js","sourceRoot":"","sources":["PrivilegedUserCanAccessAll.ts"],"names":[],"mappings":"AAEA;;;;;;;;;GASG;AACH,MAAM,CAAC,MAAM,0BAA0B,GAAwB,CAAC,OAAO,EAAE,EAAE;IAEvE,IAAI,OAAO,CAAC,IAAI,CAAC,SAAS,IAAI,CAAC,EAAE;QAC7B,OAAO,CAAC,aAAa,EAAE,CAAC;KAC3B;IAED,OAAO,IAAI,CAAC;AAChB,CAAC,CAAC"}

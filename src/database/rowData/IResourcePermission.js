@@ -1,0 +1,1 @@
+//# sourceMappingURL=IResourcePermission.js.map

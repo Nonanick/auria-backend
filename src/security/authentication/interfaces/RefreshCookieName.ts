@@ -1,0 +1,1 @@
+export const RefreshCookieName = "KEEP_ALIVE";

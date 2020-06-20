@@ -1,0 +1,1 @@
+export type ApiParameterSanitizer = ((value: any) => any);

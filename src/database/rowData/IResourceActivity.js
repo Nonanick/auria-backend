@@ -1,0 +1,1 @@
+//# sourceMappingURL=IResourceActivity.js.map

@@ -1,0 +1,1 @@
+export const PersistentLoginCookieName = "PERSISTENT_LOGIN";

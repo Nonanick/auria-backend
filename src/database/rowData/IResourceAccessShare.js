@@ -1,0 +1,1 @@
+//# sourceMappingURL=IResourceAccessShare.js.map

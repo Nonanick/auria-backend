@@ -1,0 +1,1 @@
+export const HeaderAuthenticationName = "x-auria-access-token";
