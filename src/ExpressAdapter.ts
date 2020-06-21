@@ -24,7 +24,9 @@ export class ExpressAdapter {
         this.systems = Array.from(Object.values(SystemCatalog));
 
         for (let system of this.systems) {
-            this.registerSystemInExpress(system, this.app);
+            system.start().then(_ => {
+                this.registerSystemInExpress(system, this.app);
+            });
         }
     }
 
@@ -59,7 +61,7 @@ export class ExpressAdapter {
                                     message: exc.message
                                 });
                             }
-                            
+
                             console.error(`[ExpressAdapter] ERROR! Requisition to API ${apiUrl} failed with an internal error!`, exc);
 
                             return this.sendSystemResponse(res, {
@@ -131,5 +133,9 @@ export class ExpressAdapter {
         });
 
         return req;
+    }
+
+    public async start() {
+        return Promise.all(this.systems.map(s => s.start()));
     }
 }

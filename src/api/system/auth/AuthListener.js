@@ -67,7 +67,7 @@ export class AuthListener extends SystemApiListener {
             const refresh = request.cookies[RefreshCookieName];
             try {
                 const refreshInfo = jwt.verify(refresh, AuthenticationConfig.jwt_secret.refresh);
-                const user = yield system.getUserManager()
+                const user = yield system.users()
                     .getUser(refreshInfo.username, {
                     loadIfNotExists: false,
                     markAsLoggedIn: false
@@ -109,7 +109,7 @@ export class AuthListener extends SystemApiListener {
                     sessionToken,
                     keepSignedIn: true
                 };
-                const authentication = yield system.getUserAuthenticator()
+                const authentication = yield system.authenticator()
                     .getLoginFunction("SessionCookie")(system, request.referer, sessionLoginParams);
                 attempt.success = true;
                 const attempts = this.loginAttemptManager.clearLoginAttempts(request);

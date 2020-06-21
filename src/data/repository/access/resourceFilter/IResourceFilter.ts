@@ -2,5 +2,5 @@ import { DefaultRowData } from "../../../../database/rowData/default/DefaultRowD
 import { User } from "../../../../user/User.js";
 
 export interface IResourceFilter<T extends DefaultRowData> {
-    getFilter(user : User);
+    getFilter(user : User) : string;
 }

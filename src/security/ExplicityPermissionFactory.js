@@ -35,10 +35,5 @@ export class ExplicitPermissionFactory {
             return checkApiAccess;
         }));
     }
-    getAccessibleRolesIdFromUser(user) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return Object.keys((yield user.roles()).getAccessibleRoles());
-        });
-    }
 }
 //# sourceMappingURL=ExplicityPermissionFactory.js.map

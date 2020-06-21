@@ -86,3 +86,19 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+
+# Yanr
+yarn-error.log
+yarn.lock
+
+# Photoshop folder
+ps/
+
+# Built js's
+src/**/*.js
+src/*.js
+**/*.js.map
+*.js.map
+
+# Tests?
+tests/

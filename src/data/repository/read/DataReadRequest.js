@@ -15,7 +15,7 @@ export class DataReadRequest {
         this._limit = limit <= 0 ? "unlimited" : limit;
     }
     get page() {
-        return this.page;
+        return this._page;
     }
     set page(page) {
         this.paginationEnabled = true;

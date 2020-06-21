@@ -2,9 +2,9 @@
 import { EventEmitter } from "events";
 import { ResourceManager } from "./database/ResourceManager.js";
 import { ModuleManager } from "./module/ModuleManager.js";
+import { ISystemResponse } from "auria-lib";
 import { UserManager } from "./user/UserManager.js";
 import { ApiAccessPolicyEnforcer } from "./security/apiAccess/ApiAccessPolicyEnforcer.js";
-import { SystemResponse } from './http/SystemResponse.js';
 import { Authenticator } from "./security/authentication/Authenticator.js";
 import { ExplicitPermissionFactory } from "./security/ExplicityPermissionFactory.js";
 import { IApiListener } from "./api/IApiListener.js";
@@ -12,6 +12,8 @@ import { SystemConfiguration } from "./SystemConfiguration.js";
 import { ApiRouteMetadata } from "./api/ExposedApiEnpointsMetadata.js";
 import { ISystemRequest } from "./http/ISystemRequest.js";
 import Knex from "knex";
+import { BootSequence } from "./boot/BootSequence.js";
+import { DataRepository } from './data/repository/DataRepository.js';
 export declare abstract class System extends EventEmitter implements IApiListener {
     /**
     * System Base URL
@@ -33,15 +35,16 @@ export declare abstract class System extends EventEmitter implements IApiListene
         [name: string]: IApiListener;
     };
     protected _name: string;
-    protected _boot: Promise<boolean>;
+    protected _boot: BootSequence;
     getBootDependencies: () => never[];
     getBootableName: () => string;
     getBootFunction: () => () => Promise<boolean>;
-    protected configuration: SystemConfiguration;
+    protected _configuration: SystemConfiguration;
     protected _resourceManager: ResourceManager;
     protected _moduleManager: ModuleManager;
     protected _users: UserManager;
     protected _authenticator: Authenticator;
+    protected _data: DataRepository;
     protected apiAccessPolicyEnforcer: ApiAccessPolicyEnforcer;
     protected explicitPermissionFactory: ExplicitPermissionFactory;
     protected apiEndpointCache: {
@@ -87,9 +90,14 @@ export declare abstract class System extends EventEmitter implements IApiListene
     resourceManager(): ResourceManager;
     authenticator(): Authenticator;
     users(): UserManager;
-    install(filterResource: string): () => Promise<any[]>;
-    answerRequest(systemRequest: ISystemRequest): () => Promise<SystemResponse | (() => Promise<SystemResponse>)>;
-    generateSystemResponse(request: ISystemRequest, ans: any): () => Promise<SystemResponse>;
-    prepareResponse(data: any, request: ISystemRequest): SystemResponse;
-    prepareErrorResponse(exc: Error, request: ISystemRequest, code?: number): SystemResponse;
+    data(): DataRepository;
+    install(filterResource?: string): Promise<() => Promise<any[]>>;
+    answerRequest(systemRequest: ISystemRequest): Promise<ISystemResponse>;
+    generateSystemResponse(request: ISystemRequest, ans: any): Promise<ISystemResponse>;
+    prepareResponse(data: any, request: ISystemRequest): ISystemResponse;
+    prepareErrorResponse(exc: Error, request: ISystemRequest, code?: number): ISystemResponse;
+}
+export declare enum SystemEvents {
+    BOOT = "boot",
+    API_ROUTE_ADDED = "routeAdded"
 }

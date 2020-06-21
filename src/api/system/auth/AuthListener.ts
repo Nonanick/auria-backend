@@ -7,7 +7,6 @@ import { IApiListener } from "../../IApiListener.js";
 import { System } from "../../../System.js";
 import { ExposedApiRoutesMetadata } from "../../ExposedApiEnpointsMetadata.js";
 import { BooleanSanitizer } from "../../../data/sanitizer/BooleanSanitizer.js";
-import { SystemApiEndpoint } from "../SystemApiEndpoint.js";
 import { SystemApiListener } from "../SystemApiListener.js";
 import { LoginAttemptDenied } from "../../../exception/system/authentication/LoginAttemptDenied.js";
 import { LoginAttemptManager } from "../../../security/authentication/loginAttempt/LoginAttemptManager.js";
@@ -23,6 +22,7 @@ import { RefreshCookieName } from '../../../security/authentication/interfaces/R
 import { PersistentLoginCookieName } from '../../../security/authentication/interfaces/PersistentLoginCookieName.js';
 import { CredentialsLoginParams } from '../../../security/authentication/credentials/CredentialsLoginParams.js';
 import { Guest_Username } from '../../../user/User.js';
+import { SystemApiRoute } from '../SystemApiRoute.js';
 
 export class AuthListener extends SystemApiListener implements IApiListener {
 
@@ -80,14 +80,14 @@ export class AuthListener extends SystemApiListener implements IApiListener {
         return 'auth';
     };
 
-    protected hashPassword: SystemApiEndpoint = async (request) => {
+    protected hashPassword: SystemApiRoute = async (request) => {
         return {
             hash: await bcrypt.hash(request.parameters['password'], 10),
             _id: nanoid()
         };
     };
 
-    protected login: SystemApiEndpoint = async (request) => {
+    protected login: SystemApiRoute = async (request) => {
 
         const username = request.parameters["username"]; // Marked as required param!
         const password = request.parameters["password"]; // Marked as required param!
@@ -124,7 +124,7 @@ export class AuthListener extends SystemApiListener implements IApiListener {
         }
     };
 
-    protected refresh: SystemApiEndpoint = async (request, system) => {
+    protected refresh: SystemApiRoute = async (request, system) => {
 
         if (request.cookies[RefreshCookieName] == null) {
             console.error("[AuthListener] Refresh token not sent, request failed!");
@@ -135,7 +135,7 @@ export class AuthListener extends SystemApiListener implements IApiListener {
 
         try {
             const refreshInfo = jwt.verify(refresh, AuthenticationConfig.jwt_secret.refresh) as UserRefreshTokenInfo;
-            const user = await system.getUserManager()
+            const user = await system.users()
                 .getUser(refreshInfo.username, {
                     loadIfNotExists: false,
                     markAsLoggedIn: false
@@ -170,7 +170,7 @@ export class AuthListener extends SystemApiListener implements IApiListener {
 
     };
 
-    protected handshake: SystemApiEndpoint = async (request, system) => {
+    protected handshake: SystemApiRoute = async (request, system) => {
         if (request.cookies[PersistentLoginCookieName] == null) {
             console.error("[AuthListener] Persistent Login token not sent, request failed!");
             throw new Error("Cannot refresh token!");
@@ -184,7 +184,7 @@ export class AuthListener extends SystemApiListener implements IApiListener {
                 keepSignedIn: true
             };
 
-            const authentication = await system.getUserAuthenticator()
+            const authentication = await system.authenticator()
                 .getLoginFunction("SessionCookie")
                 (system, request.referer!, sessionLoginParams);
 

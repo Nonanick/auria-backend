@@ -2,7 +2,7 @@ import { EventEmitter } from "events";
 import { ResourceManager } from "./database/ResourceManager.js";
 import { DupplicatedURI } from "./exception/system/DupplicatedURI.js";
 import { ModuleManager } from "./module/ModuleManager.js";
-import { AuriaException } from "auria-lib";
+import { AuriaException, ISystemResponse } from "auria-lib";
 import { UserManager } from "./user/UserManager.js";
 import { ApiEndpointNotFound } from "./exception/system/request/ApiEndpointNotFound.js";
 import { ApiAccessPolicyEnforcer } from "./security/apiAccess/ApiAccessPolicyEnforcer.js";
@@ -20,6 +20,9 @@ import { ApiAccessRule } from "./security/apiAccess/AccessRule.js";
 import { ResourceRow } from "./database/resources/sql/ResourceRow.js";
 import { ISystemRequest } from "./http/ISystemRequest.js";
 import Knex from "knex";
+import { BootSequence } from "./boot/BootSequence.js";
+import { DataListener } from "./api/system/data/DataListener.js";
+import { DataRepository } from './data/repository/DataRepository.js';
 
 export abstract class System extends EventEmitter implements IApiListener {
 
@@ -31,6 +34,7 @@ export abstract class System extends EventEmitter implements IApiListener {
     *
     */
     protected systemBaseURL = "";
+
     /**
      * Api Listeners
      * --------------
@@ -45,7 +49,7 @@ export abstract class System extends EventEmitter implements IApiListener {
 
     protected _name: string;
 
-    protected _boot!: Promise<boolean>;
+    protected _boot!: BootSequence;
 
     public getBootDependencies = () => {
         return [];
@@ -59,15 +63,17 @@ export abstract class System extends EventEmitter implements IApiListener {
         return async () => {
             this.addApiListener(new AuthListener(this));
             this.addApiListener(new UserListener(this));
+            this.addApiListener(new DataListener(this));
             return true;
         };
     };
 
-    protected configuration: SystemConfiguration;
+    protected _configuration: SystemConfiguration;
     protected _resourceManager: ResourceManager;
     protected _moduleManager: ModuleManager;
     protected _users: UserManager;
     protected _authenticator: Authenticator;
+    protected _data!: DataRepository;
     protected apiAccessPolicyEnforcer: ApiAccessPolicyEnforcer;
     //if (process.env.NODE_ENV === "development")
 
@@ -80,13 +86,20 @@ export abstract class System extends EventEmitter implements IApiListener {
     constructor(configuration: SystemConfiguration) {
         super();
 
-        this.configuration = configuration;
+        this._configuration = configuration;
 
         this._name = configuration.name;
+
+        this._boot = new BootSequence();
+        this._boot.addBootable(this.getBootableName(), this, {
+            triggerEvent: SystemEvents.BOOT
+        });
+
         this._resourceManager = new ResourceManager(this);
         this._moduleManager = new ModuleManager(this);
         this._users = new UserManager(this);
         this._authenticator = new Authenticator(this);
+        this._data = new DataRepository(this);
 
         this.apiAccessPolicyEnforcer = new ApiAccessPolicyEnforcer(this);
 
@@ -95,7 +108,7 @@ export abstract class System extends EventEmitter implements IApiListener {
         this.explicitPermissionFactory = new ExplicitPermissionFactory(this);
 
     }
-    
+
     public abstract getConnection(): Knex;
 
     public get name(): string {
@@ -107,14 +120,10 @@ export abstract class System extends EventEmitter implements IApiListener {
     }
 
     public start(): Promise<boolean> {
-        if (this._boot == null) {
-            this._boot = this.getBootFunction()();
-        }
-
-        return this._boot;
+        return this._boot.initialize();
     }
 
-   
+
 
     public baseUrl(): string {
         return this.systemBaseURL;
@@ -211,7 +220,11 @@ export abstract class System extends EventEmitter implements IApiListener {
         return this._users;
     }
 
-    public install(filterResource: string) {
+    public data() {
+        return this._data;
+    }
+
+    public async install(filterResource?: string) {
         return async () => {
             const filter = filterResource || "";
 
@@ -249,69 +262,69 @@ export abstract class System extends EventEmitter implements IApiListener {
         };
     }
 
-    public answerRequest(systemRequest: ISystemRequest) {
-        return async () => {
-            console.log(`[System] INFO! Request receiveid for api endpoint: ${systemRequest.url}\nReferer: ${systemRequest.referer}`);
-            let urlPieces = systemRequest.url.split('/');
-            const user = await this._authenticator.authenticateRequest(systemRequest);
-            systemRequest.getUser = () => user;
-            if (!(await this.apiAccessPolicyEnforcer.userCanAccessApi(user, systemRequest))) {
-                return this.prepareErrorResponse(new UserAccessNotAuthorized("The current url is unavaliable for this user!"), systemRequest, 403);
+    public async answerRequest(systemRequest: ISystemRequest): Promise<ISystemResponse> {
+
+        console.log(`[System] INFO! Request receiveid for api endpoint: ${systemRequest.url}\nReferer: ${systemRequest.referer}`);
+        let urlPieces = systemRequest.url.split('/');
+        const user = await this._authenticator.authenticateRequest(systemRequest);
+        systemRequest.getUser = () => user;
+        if (!(await this.apiAccessPolicyEnforcer.userCanAccessApi(user, systemRequest))) {
+            return this.prepareErrorResponse(new UserAccessNotAuthorized("The current url is unavaliable for this user!"), systemRequest, 403);
+        }
+        if (this.apiListeners[urlPieces[0]] != null) {
+            // Remove "payload"
+            systemRequest.url = systemRequest.url.slice(urlPieces[0].length + 1);
+            try {
+                const listenerAnswer = this.apiListeners[urlPieces[0]].answerRequest(systemRequest);
+                return this.generateSystemResponse(systemRequest, listenerAnswer);
             }
-            if (this.apiListeners[urlPieces[0]] != null) {
-                // Remove "payload"
-                systemRequest.url = systemRequest.url.slice(urlPieces[0].length + 1);
-                try {
-                    const listenerAnswer = this.apiListeners[urlPieces[0]].answerRequest(systemRequest);
-                    return this.generateSystemResponse(systemRequest, listenerAnswer);
-                }
-                catch (err) {
-                    if (err instanceof AuriaException)
-                        return this.prepareErrorResponse(err, systemRequest, 400);
-                    else
-                        return this.prepareErrorResponse(err, systemRequest);
-                }
+            catch (err) {
+                if (err instanceof AuriaException)
+                    return this.prepareErrorResponse(err, systemRequest, 400);
+                else
+                    return this.prepareErrorResponse(err, systemRequest);
             }
-            else {
-                console.error("[System] ERROR Request Failed! System does not know an API Listener to the baseURL ", urlPieces[0]);
-                return this.prepareErrorResponse(new ApiEndpointNotFound(`The requested path ${systemRequest.url} does not match a valid exposed API!`), systemRequest, 404);
-            }
-        };
+        }
+        else {
+            console.error("[System] ERROR Request Failed! System does not know an API Listener to the baseURL ", urlPieces[0]);
+            return this.prepareErrorResponse(new ApiEndpointNotFound(`The requested path ${systemRequest.url} does not match a valid exposed API!`), systemRequest, 404);
+        }
+
     }
 
-    public generateSystemResponse(request: ISystemRequest, ans: any) {
-        return async () => {
-            if (ans instanceof Promise) {
-                ans.catch((err) => {
-                    return this.prepareErrorResponse(err, request);
-                });
-                return ans.then((promisedResponse) => {
-                    if (promisedResponse instanceof SystemResponse) {
-                        return promisedResponse;
-                    }
-                    else {
-                        return this.prepareResponse(promisedResponse, request);
-                    }
-                });
-            }
-            else {
-                if (ans instanceof SystemResponse) {
-                    return ans;
+    public async generateSystemResponse(request: ISystemRequest, ans: any): Promise<ISystemResponse> {
+
+        if (ans instanceof Promise) {
+            ans.catch((err) => {
+                return this.prepareErrorResponse(err, request);
+            });
+            return ans.then((promisedResponse) => {
+                if (promisedResponse instanceof SystemResponse) {
+                    return promisedResponse;
                 }
                 else {
-                    return this.prepareResponse(ans, request);
+                    return this.prepareResponse(promisedResponse, request);
                 }
+            });
+        }
+        else {
+            if (ans instanceof SystemResponse) {
+                return ans;
             }
-        };
+            else {
+                return this.prepareResponse(ans, request);
+            }
+        }
+
     }
 
-    public prepareResponse(data: any, request: ISystemRequest) {
+    public prepareResponse(data: any, request: ISystemRequest): ISystemResponse {
         let response = new SystemResponse(`API call to ${request.url} resolved successfully!`);
         response.data = data;
         return response;
     }
 
-    public prepareErrorResponse(exc: Error, request: ISystemRequest, code?: number) {
+    public prepareErrorResponse(exc: Error, request: ISystemRequest, code?: number): ISystemResponse {
         let response = new SystemResponse(exc.message);
         if (exc instanceof AuriaException) {
             response.data = exc.getReponseData();
@@ -323,4 +336,9 @@ export abstract class System extends EventEmitter implements IApiListener {
         }
         return response;
     }
+}
+
+export enum SystemEvents {
+    BOOT = "boot",
+    API_ROUTE_ADDED = "routeAdded",
 }

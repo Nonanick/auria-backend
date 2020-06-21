@@ -31,7 +31,7 @@ export class UserRoleRepository {
             return this.buildUserRolesPromise;
         });
     }
-    getOwnRoles() {
+    getRoles() {
         return Object.assign({}, this.roles);
     }
     getRolesId() {

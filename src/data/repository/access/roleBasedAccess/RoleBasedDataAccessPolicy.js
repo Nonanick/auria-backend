@@ -7,6 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import { ResourceCatalog } from "../../../../database/resources/ResourceCatalog.js";
 export class RoleBasedDataAccessPolicy {
     get name() {
         return "RoleBasedDataAccessPolicy";
@@ -32,35 +33,21 @@ export class RoleBasedDataAccessPolicy {
             }
         ];
     }
-    getReadPolicy(context, options) {
+    applyFilter(query, context) {
         return __awaiter(this, void 0, void 0, function* () {
-            let includedRoles = this.getIncludedRoles(context.user, options);
-            return "";
-        });
-    }
-    getIncludedRoles(user, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (options["ALLOW_PARENT_ROLE"] && options["ALLOW_SAME_ROLE"]) {
-                return (yield user.roles()).getAccessibleRolesId();
+            const roles = yield (yield context.user.roles()).getRolesId();
+            switch (context.procedure) {
+                default:
+                    query.whereIn(context.resource.getRowPrimaryField(), function () {
+                        this.table(ResourceCatalog.ResourceActivity.table_name)
+                            .select("resource_row_id")
+                            .where("resource_id", context.resource.get("_id"))
+                            .whereIn("role_id", roles)
+                            .orWhereIn("role_authority", roles);
+                    });
             }
-            if (options["ALLOW_PARENT_ROLE"]) {
-                let allAcessibleRoles;
-            }
+            return query;
         });
-    }
-    getUpdatePolicy(context, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return "";
-        });
-    }
-    getDeletePolicy(context, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return "";
-        });
-    }
-    onInsert(context, options) {
-    }
-    on(procedure, context) {
     }
 }
 //# sourceMappingURL=RoleBasedDataAccessPolicy.js.map

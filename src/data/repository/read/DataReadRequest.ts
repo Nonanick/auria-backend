@@ -22,7 +22,7 @@ export class DataReadRequest<T = any> implements IReadRequest {
     }
 
     public get page(): number {
-        return this.page;
+        return this._page;
     }
 
     public set page(page: number) {

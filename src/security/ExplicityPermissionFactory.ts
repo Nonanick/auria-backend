@@ -43,8 +43,4 @@ export class ExplicitPermissionFactory implements IExplicitPermissionFactory {
             return checkApiAccess;
         });
     }
-
-    protected async getAccessibleRolesIdFromUser(user: User): Promise<string[]> {
-        return Object.keys((await user.roles()).getAccessibleRoles());
-    }
 }

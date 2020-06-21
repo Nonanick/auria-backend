@@ -60,9 +60,12 @@ export function validateRequestWithApiMetadata(apiMetadata, request) {
         if (apiMetadata.optionalParams) {
             for (let paramName of apiMetadata.optionalParams) {
                 if (typeof paramName !== "string") {
-                    let valid = yield validateApiParam(paramName, request);
-                    if (!valid) {
-                        throw new ValidationFailed(`Validation for parameter ${paramName} failed! Please check the expected input for this api!`);
+                    // Only validates present optional parameters!
+                    if (request.parameters[paramName.name] != null) {
+                        let valid = yield validateApiParam(paramName, request);
+                        if (!valid) {
+                            throw new ValidationFailed(`Validation for parameter ${paramName} failed! Please check the expected input for this api!`);
+                        }
                     }
                 }
             }

@@ -7,4 +7,5 @@ export declare class ExpressAdapter {
     private registerSystemInExpress;
     private sendSystemResponse;
     private generateSystemRequest;
+    start(): Promise<boolean[]>;
 }

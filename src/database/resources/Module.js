@@ -1,6 +1,7 @@
 import { ResourceRow } from "./sql/ResourceRow.js";
 import { ColumnRow } from "./sql/ColumnRow.js";
 import { ResourceCatalog } from "./ResourceCatalog.js";
+import { ActiveStatusFilterProvider, ActiveStatusFilterName } from "../query/status/ActiveStatusFilterProvider.js";
 export class Module extends ResourceRow {
     constructor() {
         super({
@@ -73,6 +74,7 @@ export class Module extends ResourceRow {
             status: "active",
             default_value: "Hybrid"
         }));
+        this.addFilter(ActiveStatusFilterName, ActiveStatusFilterProvider);
     }
 }
 //# sourceMappingURL=Module.js.map

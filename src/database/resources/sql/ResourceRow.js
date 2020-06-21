@@ -19,8 +19,10 @@ export class ResourceRow extends DefaultRow {
             status: 'active',
             is_system_resource: false,
         }, data));
+        this._primaryField = "_id";
         this.columns = {};
         this.references = {};
+        this.filterProviders = {};
         const idColumn = new ColumnRow({
             name: "Id",
             column_name: "_id",
@@ -115,6 +117,10 @@ export class ResourceRow extends DefaultRow {
                 throw new Error(`[ResourceRow] Duplicate column on resource! Column with name ${columnName} already exists in ${this.get("name")}`);
             column.setResource(this);
             column.setConnection(this.connection);
+            // Auto update Primary field!
+            if (column.get("column_keys").includes("PRI")) {
+                this.setRowPrimaryField(column.get("column_name"));
+            }
             this.columns[columnName] = column;
         });
     }
@@ -187,6 +193,31 @@ export class ResourceRow extends DefaultRow {
             }
             return ans;
         });
+    }
+    addFilter(name, filter, options) {
+        if (this.filterProviders[name] != null) {
+            if (this.filterProviders[name].allowOverride === false) {
+                throw new Error("ERROR! Filter proviter with name" + name + " DOES NOT ALLOW oveeride!");
+            }
+            console.warn("WARN! Filter provider with name ", name, " already exists in recource ", this.get("name"), "! Overriding it!");
+        }
+        this.filterProviders[name] = Object.assign(Object.assign({ filterProvider: filter, name: name }, {
+            allowOverride: true
+        }), options || {});
+    }
+    removeFilter(name) {
+        if (this.filterProviders[name] == null) {
+            console.info("INFO! Filter with name ", name, " is not avaliable on resource ", this.get("name"), " and therefore cannot be disabled!");
+            return true;
+        }
+        if (this.filterProviders[name].allowOverride === false) {
+            console.warn("WARN! Filter with name ", name, " CANNOT be disabled in ", this.get("name"), " because it was set with 'allowOverride' as false!");
+            return;
+        }
+        delete this.filterProviders[name];
+    }
+    getFilters() {
+        return Array.from(Object.values(this.filterProviders)).map(f => f.filterProvider);
     }
 }
 //# sourceMappingURL=ResourceRow.js.map

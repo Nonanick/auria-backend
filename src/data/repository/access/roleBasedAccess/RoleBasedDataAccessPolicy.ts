@@ -1,6 +1,11 @@
 import { IDataAccessPolicy, IResourceAccessPolicyContext } from "../IDataAccessPolicy.js";
 import { DataProcedure } from "../../../../database/procedures/DataProcedure.js";
 import { User } from "../../../../user/User.js";
+import { QueryBuilder } from "knex";
+import { IDataFilterContext } from "../../../../database/query/IDataFilterContext.js";
+import { ResourceCatalog } from "../../../../database/resources/ResourceCatalog.js";
+import { ResourceActivity } from "../../../../database/resources/ResourceActivity.js";
+import { IResourceActivity } from "../../../../database/rowData/IResourceActivity.js";
 
 export class RoleBasedDataAccessPolicy implements IDataAccessPolicy {
 
@@ -31,38 +36,22 @@ export class RoleBasedDataAccessPolicy implements IDataAccessPolicy {
         ];
     }
 
-    public async getReadPolicy(context: IResourceAccessPolicyContext, options: any): Promise<string> {
-        let includedRoles = this.getIncludedRoles(context.user, options);
-
-        return "";
-
-    }
-
-    protected async getIncludedRoles(user: User, options: any) {
-        if (options["ALLOW_PARENT_ROLE"] && options["ALLOW_SAME_ROLE"]) {
-            return (await user.roles()).getAccessibleRolesId();
+    public async applyFilter(query: QueryBuilder, context: IDataFilterContext) {
+        const roles = await (await context.user.roles()).getRolesId();
+        switch (context.procedure) {
+            default:
+                query.whereIn(
+                    context.resource.getRowPrimaryField(),
+                    function () {
+                        this.table(ResourceCatalog.ResourceActivity.table_name)
+                            .select<IResourceActivity>("resource_row_id")
+                            .where("resource_id", context.resource.get("_id"))
+                            .whereIn("role_id", roles)
+                            .orWhereIn("role_authority", roles)
+                    }
+                );
         }
-
-        if (options["ALLOW_PARENT_ROLE"]) {
-            let allAcessibleRoles;
-        }
-
-
-    }
-
-    public async getUpdatePolicy(context: IResourceAccessPolicyContext, options: any): Promise<string> {
-        return "";
-    }
-    public async getDeletePolicy(context: IResourceAccessPolicyContext, options: any): Promise<string> {
-        return ""
-    }
-
-    public onInsert(context: IResourceAccessPolicyContext, options: any) {
-
-
-    }
-    public on(procedure: DataProcedure, context: IResourceAccessPolicyContext) {
-
+        return query;
     }
 
 

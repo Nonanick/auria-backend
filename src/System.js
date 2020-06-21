@@ -22,6 +22,9 @@ import { UserListener } from "./api/system/user/UserListener.js";
 import { Authenticator } from "./security/authentication/Authenticator.js";
 import { UserAccessNotAuthorized } from './exception/system/security/UserAccessNotAuthorized.js';
 import { ExplicitPermissionFactory } from "./security/ExplicityPermissionFactory.js";
+import { BootSequence } from "./boot/BootSequence.js";
+import { DataListener } from "./api/system/data/DataListener.js";
+import { DataRepository } from './data/repository/DataRepository.js';
 export class System extends EventEmitter {
     constructor(configuration) {
         super();
@@ -52,15 +55,21 @@ export class System extends EventEmitter {
             return () => __awaiter(this, void 0, void 0, function* () {
                 this.addApiListener(new AuthListener(this));
                 this.addApiListener(new UserListener(this));
+                this.addApiListener(new DataListener(this));
                 return true;
             });
         };
-        this.configuration = configuration;
+        this._configuration = configuration;
         this._name = configuration.name;
+        this._boot = new BootSequence();
+        this._boot.addBootable(this.getBootableName(), this, {
+            triggerEvent: SystemEvents.BOOT
+        });
         this._resourceManager = new ResourceManager(this);
         this._moduleManager = new ModuleManager(this);
         this._users = new UserManager(this);
         this._authenticator = new Authenticator(this);
+        this._data = new DataRepository(this);
         this.apiAccessPolicyEnforcer = new ApiAccessPolicyEnforcer(this);
         //if (process.env.NODE_ENV === "development")
         this.apiAccessPolicyEnforcer.setGlobalPolicy(/.*/g, PrivilegedUserCanAccessAll);
@@ -73,10 +82,7 @@ export class System extends EventEmitter {
         throw new Error("[System] System name can only be modified internally!");
     }
     start() {
-        if (this._boot == null) {
-            this._boot = this.getBootFunction()();
-        }
-        return this._boot;
+        return this._boot.initialize();
     }
     baseUrl() {
         return this.systemBaseURL;
@@ -164,43 +170,48 @@ export class System extends EventEmitter {
     users() {
         return this._users;
     }
+    data() {
+        return this._data;
+    }
     install(filterResource) {
-        return () => __awaiter(this, void 0, void 0, function* () {
-            const filter = filterResource || "";
-            const matchFilter = (name) => {
-                return filter == ""
-                    || String(name.get("name")).toLocaleLowerCase().indexOf(filter.toLocaleLowerCase()) >= 0;
-            };
-            const allResources = this.resourceManager().getAllResources();
-            // Build Schema
-            for (let a = 0; a < allResources.length; a++) {
-                const resourceRow = allResources[a];
-                if (matchFilter(resourceRow))
-                    yield resourceRow.install(this.getConnection());
-            }
-            // Register as Rows
-            for (let b = 0; b < allResources.length; b++) {
-                const resourceRow = allResources[b];
-                if (matchFilter(resourceRow)) {
-                    yield resourceRow.save();
-                    let cols = resourceRow.getColumns();
-                    for (let c = 0; c < cols.length; c++) {
-                        yield cols[c].save();
+        return __awaiter(this, void 0, void 0, function* () {
+            return () => __awaiter(this, void 0, void 0, function* () {
+                const filter = filterResource || "";
+                const matchFilter = (name) => {
+                    return filter == ""
+                        || String(name.get("name")).toLocaleLowerCase().indexOf(filter.toLocaleLowerCase()) >= 0;
+                };
+                const allResources = this.resourceManager().getAllResources();
+                // Build Schema
+                for (let a = 0; a < allResources.length; a++) {
+                    const resourceRow = allResources[a];
+                    if (matchFilter(resourceRow))
+                        yield resourceRow.install(this.getConnection());
+                }
+                // Register as Rows
+                for (let b = 0; b < allResources.length; b++) {
+                    const resourceRow = allResources[b];
+                    if (matchFilter(resourceRow)) {
+                        yield resourceRow.save();
+                        let cols = resourceRow.getColumns();
+                        for (let c = 0; c < cols.length; c++) {
+                            yield cols[c].save();
+                        }
                     }
                 }
-            }
-            // Build References
-            for (let a = 0; a < allResources.length; a++) {
-                const resourceRow = allResources[a];
-                if (matchFilter(resourceRow)) {
-                    yield resourceRow.installReferences(this.getConnection());
+                // Build References
+                for (let a = 0; a < allResources.length; a++) {
+                    const resourceRow = allResources[a];
+                    if (matchFilter(resourceRow)) {
+                        yield resourceRow.installReferences(this.getConnection());
+                    }
                 }
-            }
-            return allResources.map(r => r.get("name"));
+                return allResources.map(r => r.get("name"));
+            });
         });
     }
     answerRequest(systemRequest) {
-        return () => __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function* () {
             console.log(`[System] INFO! Request receiveid for api endpoint: ${systemRequest.url}\nReferer: ${systemRequest.referer}`);
             let urlPieces = systemRequest.url.split('/');
             const user = yield this._authenticator.authenticateRequest(systemRequest);
@@ -229,7 +240,7 @@ export class System extends EventEmitter {
         });
     }
     generateSystemResponse(request, ans) {
-        return () => __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, void 0, void 0, function* () {
             if (ans instanceof Promise) {
                 ans.catch((err) => {
                     return this.prepareErrorResponse(err, request);
@@ -271,4 +282,9 @@ export class System extends EventEmitter {
         return response;
     }
 }
+export var SystemEvents;
+(function (SystemEvents) {
+    SystemEvents["BOOT"] = "boot";
+    SystemEvents["API_ROUTE_ADDED"] = "routeAdded";
+})(SystemEvents || (SystemEvents = {}));
 //# sourceMappingURL=System.js.map

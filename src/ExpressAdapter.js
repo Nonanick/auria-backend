@@ -22,7 +22,9 @@ export class ExpressAdapter {
         this.app.disable("x-powered-by");
         this.systems = Array.from(Object.values(SystemCatalog));
         for (let system of this.systems) {
-            this.registerSystemInExpress(system, this.app);
+            system.start().then(_ => {
+                this.registerSystemInExpress(system, this.app);
+            });
         }
     }
     registerSystemInExpress(system, app) {
@@ -105,6 +107,11 @@ export class ExpressAdapter {
             referer: `IP: [${(request.ip || "IP_NOT_PROVIDED")}] - UA: [${(request.headers['user-agent'] || "USER_AGENT_NOT_PROVIDED")}] - ENTRY: "Express"`,
         });
         return req;
+    }
+    start() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Promise.all(this.systems.map(s => s.start()));
+        });
     }
 }
 //# sourceMappingURL=ExpressAdapter.js.map

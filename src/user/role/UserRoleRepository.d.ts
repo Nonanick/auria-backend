@@ -10,7 +10,7 @@ export declare class UserRoleRepository {
     };
     constructor(system: System, user: User);
     build(): Promise<UserRoleRepository>;
-    getOwnRoles(): {
+    getRoles(): {
         [roleId: string]: Row<IUserRoleInformation>;
     };
     getRolesId(): Promise<string[]>;

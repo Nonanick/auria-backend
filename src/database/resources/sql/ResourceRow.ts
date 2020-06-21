@@ -6,8 +6,11 @@ import { ResourceCatalog } from "../ResourceCatalog.js";
 import { AuriaRow } from "../default/AuriaRow.js";
 import { DefaultRowData } from "../../rowData/default/DefaultRowData.js";
 import { IResource } from "../../rowData/IResource.js";
+import { IDataFilterProvider } from "../../query/IDataFilterProvider.js";
 
 export class ResourceRow extends DefaultRow<IResource> {
+
+    protected _primaryField: string = "_id";
 
     protected columns: {
         [columnName: string]: ColumnRow
@@ -15,6 +18,10 @@ export class ResourceRow extends DefaultRow<IResource> {
 
     protected references: {
         [referenceName: string]: ReferenceRow
+    } = {};
+
+    protected filterProviders: {
+        [filterName: string]: IResourceFilterProviderConfiguration;
     } = {};
 
     constructor(data: Partial<IResource> & Required<Pick<IResource, "name" | "table_name">>) {
@@ -129,6 +136,11 @@ export class ResourceRow extends DefaultRow<IResource> {
             column.setResource(this);
             column.setConnection(this.connection);
 
+            // Auto update Primary field!
+            if (column.get("column_keys").includes("PRI")) {
+                this.setRowPrimaryField(column.get("column_name"));
+            }
+
             this.columns[columnName] = column;
         });
     }
@@ -206,4 +218,52 @@ export class ResourceRow extends DefaultRow<IResource> {
         }
         return ans;
     }
-
+
+    public addFilter(name: string, filter: IDataFilterProvider, options?: {
+        allowOverride: boolean;
+    }) {
+
+        if (this.filterProviders[name] != null) {
+
+            if (this.filterProviders[name].allowOverride === false) {
+                throw new Error("ERROR! Filter proviter with name" + name + " DOES NOT ALLOW oveeride!");
+            }
+
+            console.warn("WARN! Filter provider with name ", name, " already exists in recource ", this.get("name"), "! Overriding it!");
+        }
+
+        this.filterProviders[name] = {
+            filterProvider: filter,
+            name: name,
+            ...{
+                allowOverride: true
+            },
+            ...options || {}
+        };
+    }
+
+    public removeFilter(name: string) {
+        if (this.filterProviders[name] == null) {
+            console.info("INFO! Filter with name ", name, " is not avaliable on resource ", this.get("name"), " and therefore cannot be disabled!");
+            return true;
+        }
+
+        if (this.filterProviders[name].allowOverride === false) {
+            console.warn("WARN! Filter with name ", name, " CANNOT be disabled in ", this.get("name"), " because it was set with 'allowOverride' as false!");
+            return;
+        }
+
+        delete this.filterProviders[name];
+    }
+
+    public getFilters(): IDataFilterProvider[] {
+        return Array.from(Object.values(this.filterProviders)).map(f => f.filterProvider);
+    }
+}
+
+export interface IResourceFilterProviderConfiguration {
+    filterProvider: IDataFilterProvider;
+    name: string;
+    allowOverride: boolean;
+
+}

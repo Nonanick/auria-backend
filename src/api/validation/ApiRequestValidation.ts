@@ -56,10 +56,14 @@ export async function validateRequestWithApiMetadata(apiMetadata: ApiRouteMetada
     // Validate optional parameters
     if (apiMetadata.optionalParams) {
         for (let paramName of apiMetadata.optionalParams) {
+
             if (typeof paramName !== "string") {
-                let valid = await validateApiParam(paramName, request);
-                if (!valid) {
-                    throw new ValidationFailed(`Validation for parameter ${paramName} failed! Please check the expected input for this api!`);
+                // Only validates present optional parameters!
+                if (request.parameters[paramName.name] != null) {
+                    let valid = await validateApiParam(paramName, request);
+                    if (!valid) {
+                        throw new ValidationFailed(`Validation for parameter ${paramName} failed! Please check the expected input for this api!`);
+                    }
                 }
             }
         }
