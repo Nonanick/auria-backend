@@ -7,6 +7,7 @@ import { IUserInfo } from "../database/rowData/IUserInfo.js";
 import { EventEmitter } from "events";
 import { IUser } from "../database/rowData/IUser.js";
 import { UserRoleRepository } from "./role/UserRoleRepository.js";
+import { UserDataRepository } from './data/UserDataRepository.js';
 
 export class User extends EventEmitter implements Bootable {
 
@@ -31,6 +32,7 @@ export class User extends EventEmitter implements Bootable {
      * 
      */
     protected _auth: UserAuthentication;
+
 
     /**
      * System
@@ -75,6 +77,8 @@ export class User extends EventEmitter implements Bootable {
 
     private _booted!: Promise<User>;
 
+    private _data : UserDataRepository;
+
     public get privilege(): number {
         return this._privilege;
     }
@@ -96,8 +100,7 @@ export class User extends EventEmitter implements Bootable {
         this.system = system;
         this._username = username;
         this._auth = new UserAuthentication(this);
-
-
+        this._data = new UserDataRepository(this, this.system);
 
         // @todo CLEAN THIS
         this._privilege = username == "nich" ? UserPrivilege.OWNER : UserPrivilege.GUEST;

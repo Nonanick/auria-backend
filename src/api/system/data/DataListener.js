@@ -13,9 +13,41 @@ export class DataListener extends SystemApiListener {
     constructor(system) {
         super(system);
         this.read = (req) => __awaiter(this, void 0, void 0, function* () {
-            const from = req.parameters['from'];
-            const procedure = req.parameters['procedure'] || "FETCH";
+            var _a;
+            const from = req.parameters.from;
+            //const procedure = req.parameters.procedure || "FETCH";
             let readRequest = new DataReadRequest(from);
+            if (req.parameters.limit)
+                readRequest.limit = req.parameters.limit;
+            if (req.parameters.page)
+                readRequest.page = req.parameters.page;
+            if (req.parameters.order) {
+                if (typeof req.parameters.order === "string") {
+                    readRequest.order = req.parameters.order;
+                }
+                else {
+                    if (req.parameters.order.by != null) {
+                        readRequest.order = {
+                            by: req.parameters.order.by,
+                            direction: String((_a = req.parameters.order.direction) !== null && _a !== void 0 ? _a : "ASC").toLocaleUpperCase()
+                        };
+                    }
+                }
+            }
+            if (req.parameters.pick) {
+                readRequest.pick = req.parameters.pick;
+            }
+            if (req.parameters.filter) {
+                if (Array.isArray(req.parameters.filter)) {
+                    let userFilterCount = 1;
+                    req.parameters['filter'].forEach((filter) => {
+                        readRequest.addFilter("User Filter - " + userFilterCount++, filter);
+                    });
+                }
+                else {
+                    readRequest.addFilter("User Filter", req.parameters['filter']);
+                }
+            }
             const readResp = yield this.system.data().read(req.getUser(), readRequest);
             return Object.assign(Object.assign({}, readResp), { models: readResp.all() });
         });

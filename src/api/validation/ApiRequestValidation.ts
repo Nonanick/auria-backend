@@ -155,14 +155,14 @@ async function runValidators(parameter: string, validators: ApiParameterValidato
             let valid = await validator(value);
             if (valid !== true) {
                 console.error("ERROR! Validation failed on parameter ", parameter, "! ", valid);
-                throw new ValidationFailed("Validation failed on parameter " + parameter) + "! - " + valid;
+                throw new ValidationFailed("Validation failed on parameter " + parameter + "! - " + valid);
             }
         }
     } else {
         let valid = await validators(value);
         if (valid !== true) {
             console.error("ERROR! Validation failed on parameter ", parameter, "! ", valid);
-            throw new ValidationFailed("Validation failed on parameter " + parameter);
+            throw new ValidationFailed("Validation failed on parameter " + parameter + "! - " + valid);
         }
     }
 

@@ -62,6 +62,7 @@ export declare class User extends EventEmitter implements Bootable {
      */
     private userRow;
     private _booted;
+    private _data;
     get privilege(): number;
     get username(): string;
     auth(): UserAuthentication;

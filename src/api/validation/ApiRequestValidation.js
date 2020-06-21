@@ -154,7 +154,7 @@ function runValidators(parameter, validators, value) {
                 let valid = yield validator(value);
                 if (valid !== true) {
                     console.error("ERROR! Validation failed on parameter ", parameter, "! ", valid);
-                    throw new ValidationFailed("Validation failed on parameter " + parameter) + "! - " + valid;
+                    throw new ValidationFailed("Validation failed on parameter " + parameter + "! - " + valid);
                 }
             }
         }
@@ -162,7 +162,7 @@ function runValidators(parameter, validators, value) {
             let valid = yield validators(value);
             if (valid !== true) {
                 console.error("ERROR! Validation failed on parameter ", parameter, "! ", valid);
-                throw new ValidationFailed("Validation failed on parameter " + parameter);
+                throw new ValidationFailed("Validation failed on parameter " + parameter + "! - " + valid);
             }
         }
         return true;

@@ -168,6 +168,26 @@ export class ResourceRow extends DefaultRow<IResource> {
         return allColumns;
     }
 
+    public hasColumn(name: string): boolean {
+        return this.getColumnName(name) != null;
+    }
+
+    public getColumnName(name: string): string | undefined {
+        const allColumnNames = this.getColumns().map(c => c.get("column_name"));
+        const allNames = this.getColumns().map(c => c.get("name"));
+
+        if (allColumnNames.includes(name)) {
+            return name;
+        }
+
+        const ioName = allNames.indexOf(name);
+        if (ioName >= 0) {
+            return this.getColumns()[ioName].get("column_name");
+        }
+
+        return undefined;
+    }
+
     public async install(connection: Knex) {
         if (this.connection == null)
             this.connection = connection;

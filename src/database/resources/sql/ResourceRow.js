@@ -142,6 +142,21 @@ export class ResourceRow extends DefaultRow {
         }
         return allColumns;
     }
+    hasColumn(name) {
+        return this.getColumnName(name) != null;
+    }
+    getColumnName(name) {
+        const allColumnNames = this.getColumns().map(c => c.get("column_name"));
+        const allNames = this.getColumns().map(c => c.get("name"));
+        if (allColumnNames.includes(name)) {
+            return name;
+        }
+        const ioName = allNames.indexOf(name);
+        if (ioName >= 0) {
+            return this.getColumns()[ioName].get("column_name");
+        }
+        return undefined;
+    }
     install(connection) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.connection == null)

@@ -24,6 +24,8 @@ export declare class ResourceRow extends DefaultRow<IResource> {
     addColumns(...columns: ColumnRow[]): void;
     addReferences(...references: ReferenceRow[]): void;
     getColumns(): ColumnRow[];
+    hasColumn(name: string): boolean;
+    getColumnName(name: string): string | undefined;
     install(connection: Knex): Promise<ColumnRow[]>;
     protected installColumns(connection: Knex): Promise<ColumnRow[]>;
     installReferences(connection: Knex): Promise<ReferenceRow[]>;

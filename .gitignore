@@ -99,6 +99,9 @@ src/**/*.js
 src/*.js
 **/*.js.map
 *.js.map
+**/*.d.ts
+*.d.ts
 
 # Tests?
 tests/
+src/*.js

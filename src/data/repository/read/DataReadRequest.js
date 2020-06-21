@@ -1,7 +1,7 @@
 export class DataReadRequest {
     constructor(from) {
         this.pick = "*";
-        this.filter = {};
+        this.filters = {};
         this.paginationEnabled = false;
         this._limit = DataReadRequest.DEFAULT_PAGE_LIMIT;
         this._page = 0;
@@ -13,6 +13,16 @@ export class DataReadRequest {
     set limit(limit) {
         this.paginationEnabled = true;
         this._limit = limit <= 0 ? "unlimited" : limit;
+    }
+    set order(order) {
+        if (typeof order === "string") {
+            this._order = {
+                by: order,
+                direction: "ASC"
+            };
+            return;
+        }
+        this._order = order;
     }
     get page() {
         return this._page;
@@ -26,6 +36,12 @@ export class DataReadRequest {
         if (this.limit <= 0) {
             this._limit = DataReadRequest.DEFAULT_PAGE_LIMIT;
         }
+    }
+    addFilter(name, filter) {
+        this.filters[name] = filter;
+    }
+    getFilters() {
+        return this.filters;
     }
     disablePagination() {
         this.paginationEnabled = false;

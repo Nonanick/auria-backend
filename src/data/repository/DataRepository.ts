@@ -4,6 +4,7 @@ import { IReadRequest, IReadResponse } from "auria-lib";
 import { DataReadResponse } from "./read/DataReadResponse.js";
 import { ResourceRow } from "../../database/resources/sql/ResourceRow.js";
 import { IDataFilterContext } from "../../database/query/IDataFilterContext.js";
+import { DataFilterAdapter } from "./read/DataFilterAdapter.js";
 
 export class DataRepository {
 
@@ -35,17 +36,28 @@ export class DataRepository {
                 q.orderBy(request.order.by, request.order.direction);
             }
         }
-        const filters = r.getFilters();
-        const filterContext : IDataFilterContext = {
-            avaliableColumns : r.getColumns().map(c => c.get("column_name")),
-            procedure : "READ",
-            roles : await (await user.roles()).getRolesId(),
-            user : user
+
+        const filterContext: IDataFilterContext = {
+            avaliableColumns: r.getColumns().map(c => c.get("column_name")),
+            procedure: "READ",
+            roles: await (await user.roles()).getRolesId(),
+            user: user,
+            resource: r
         };
-        
+
+        if (request.filters) {
+            let filterAdapter = new DataFilterAdapter(request.filters);
+            filterAdapter.applyFilter(q, filterContext);
+        }
+
+        // Resource defined filters!
+        const filters = r.getFilters();
+
         filters.forEach((f) => {
             f.applyFilter(q, filterContext);
         });
+        
+        //console.info("Data Read SQL", q.toSQL());
 
         const res = await q;
 
@@ -53,7 +65,7 @@ export class DataRepository {
         response.all = () => res;
         response.length = res.length;
         response.success = true;
-        
+
         return response;
     }
 

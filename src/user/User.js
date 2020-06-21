@@ -11,6 +11,7 @@ import { UserAuthentication } from "./auth/UserAuthentication.js";
 import { ResourceCatalog } from "../database/resources/ResourceCatalog.js";
 import { EventEmitter } from "events";
 import { UserRoleRepository } from "./role/UserRoleRepository.js";
+import { UserDataRepository } from './data/UserDataRepository.js';
 export class User extends EventEmitter {
     constructor(system, username) {
         super();
@@ -25,6 +26,7 @@ export class User extends EventEmitter {
         this.system = system;
         this._username = username;
         this._auth = new UserAuthentication(this);
+        this._data = new UserDataRepository(this, this.system);
         // @todo CLEAN THIS
         this._privilege = username == "nich" ? UserPrivilege.OWNER : UserPrivilege.GUEST;
         if (this.username !== Guest_Username) {
