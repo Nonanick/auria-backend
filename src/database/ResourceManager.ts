@@ -1,29 +1,29 @@
 import { EventEmitter } from "events";
 import { Bootable } from "../boot/Bootable.js";
-import { Resource as ResourceInstance } from './resources/Resource.js';
-import { ResourceReference as ReferenceInstance } from './resources/ResourceReference.js';
-import { Column as ColumnInstance } from './resources/Column.js';
-import { ResourceCatalog } from "./resources/ResourceCatalog.js";
-import { ResourceRow } from "./resources/sql/ResourceRow.js";
-import { Connection } from "./resources/Connection.js";
-import { Module } from "./resources/Module.js";
-import { ModuleMenu } from "./resources/ModuleMenu.js";
-import { ModulePage } from "./resources/ModulePage.js";
-import { ResourceAccessPolicy } from "./resources/ResourceAccessPolicy.js";
-import { ResourceAccessShare } from "./resources/ResourceAccessShare.js";
-import { ResourceActivity } from "./resources/ResourceActivity.js";
-import { ResourcePagePermission } from "./resources/ResourcePagePermission.js";
-import { Role } from "./resources/Role.js";
-import { User } from "./resources/User.js";
-import { UserRole } from "./resources/UserRole.js";
-import { UserInfo } from "./resources/UserInfo.js";
+import { Resource as ResourceInstance } from './schema/Resource.js';
+import { ResourceReference as ReferenceInstance } from './schema/ResourceReference.js';
+import { Column as ColumnInstance } from './schema/Column.js';
+import { ResourceCatalog } from "./schema/ResourceCatalog.js";
+import { Connection } from "./schema/Connection.js";
+import { Module } from "./schema/Module.js";
+import { ModuleMenu } from "./schema/ModuleMenu.js";
+import { ModulePage } from "./schema/ModulePage.js";
+import { ResourceAccessPolicy } from "./schema/ResourceAccessPolicy.js";
+import { ResourceAccessShare } from "./schema/ResourceAccessShare.js";
+import { ResourceActivity } from "./schema/ResourceActivity.js";
+import { ResourcePagePermission } from "./schema/ResourcePagePermission.js";
+import { Role } from "./schema/Role.js";
+import { User } from "./schema/User.js";
+import { UserRole } from "./schema/UserRole.js";
+import { UserInfo } from "./schema/UserInfo.js";
 import { System } from "../System.js";
-import { PersistentLogin } from "./resources/PersistentLogin.js";
-import { ApiAccess } from "./resources/ApiAccess.js";
+import { PersistentLogin } from "./schema/PersistentLogin.js";
+import { ApiAccess } from "./schema/ApiAccess.js";
+import { ResourceSchema } from "./schema/sql/ResourceSchema.js";
 
 export class ResourceManager extends EventEmitter implements Bootable {
 
-    private resources: { [resourceName: string]: ResourceRow } = {};
+    private resources: { [resourceName: string]: ResourceSchema } = {};
 
     private system: System;
 
@@ -73,8 +73,8 @@ export class ResourceManager extends EventEmitter implements Bootable {
         }
     };
 
-    public getAllResources(): ResourceRow[] {
-        const allResources: ResourceRow[] = [];
+    public getAllResources(): ResourceSchema[] {
+        const allResources: ResourceSchema[] = [];
 
         for (let resourceName in this.resources) {
             if (this.resources.hasOwnProperty(resourceName)) {
@@ -84,7 +84,7 @@ export class ResourceManager extends EventEmitter implements Bootable {
         return allResources;
     }
 
-    public getResource(name: string): ResourceRow {
+    public getResource(name: string): ResourceSchema {
 
         if (this.resources[name] != null) {
             return this.resources[name];

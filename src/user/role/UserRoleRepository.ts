@@ -1,6 +1,6 @@
 import { User } from "../User.js";
 import { System } from "../../System.js";
-import { ResourceCatalog } from "../../database/resources/ResourceCatalog.js";
+import { ResourceCatalog } from "../../database/schema/ResourceCatalog.js";
 import { Row } from "../../database/Row.js";
 
 export class UserRoleRepository {

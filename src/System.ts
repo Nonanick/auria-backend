@@ -17,7 +17,7 @@ import { IApiListener } from "./api/IApiListener.js";
 import { SystemConfiguration } from "./SystemConfiguration.js";
 import { ApiRouteMetadata } from "./api/ExposedApiEnpointsMetadata.js";
 import { ApiAccessRule } from "./security/apiAccess/AccessRule.js";
-import { ResourceRow } from "./database/resources/sql/ResourceRow.js";
+import { ResourceSchema } from "./database/schema/sql/ResourceSchema.js";
 import { ISystemRequest } from "./http/ISystemRequest.js";
 import Knex from "knex";
 import { BootSequence } from "./boot/BootSequence.js";
@@ -225,41 +225,41 @@ export abstract class System extends EventEmitter implements IApiListener {
     }
 
     public async install(filterResource?: string) {
-        return async () => {
-            const filter = filterResource || "";
 
-            const matchFilter = (name: ResourceRow) => {
-                return filter == ""
-                    || String(name.get("name")).toLocaleLowerCase().indexOf(filter.toLocaleLowerCase()) >= 0;
-            };
+        const filter = filterResource || "";
 
-            const allResources = this.resourceManager().getAllResources();
-            // Build Schema
-            for (let a = 0; a < allResources.length; a++) {
-                const resourceRow = allResources[a];
-                if (matchFilter(resourceRow))
-                    await resourceRow.install(this.getConnection());
-            }
-            // Register as Rows
-            for (let b = 0; b < allResources.length; b++) {
-                const resourceRow = allResources[b];
-                if (matchFilter(resourceRow)) {
-                    await resourceRow.save();
-                    let cols = resourceRow.getColumns();
-                    for (let c = 0; c < cols.length; c++) {
-                        await cols[c].save();
-                    }
-                }
-            }
-            // Build References
-            for (let a = 0; a < allResources.length; a++) {
-                const resourceRow = allResources[a];
-                if (matchFilter(resourceRow)) {
-                    await resourceRow.installReferences(this.getConnection());
-                }
-            }
-            return allResources.map(r => r.get("name"));
+        const matchFilter = (name: ResourceSchema) => {
+            return filter == ""
+                || String(name.get("name")).toLocaleLowerCase().indexOf(filter.toLocaleLowerCase()) >= 0;
         };
+
+        const allResources = this.resourceManager().getAllResources();
+        // Build Schema
+        for (let a = 0; a < allResources.length; a++) {
+            const ResourceSchema = allResources[a];
+            if (matchFilter(ResourceSchema))
+                await ResourceSchema.install(this.getConnection());
+        }
+        // Register as Rows
+        for (let b = 0; b < allResources.length; b++) {
+            const ResourceSchema = allResources[b];
+            if (matchFilter(ResourceSchema)) {
+                await ResourceSchema.save();
+                let cols = ResourceSchema.getColumns();
+                for (let c = 0; c < cols.length; c++) {
+                    await cols[c].save();
+                }
+            }
+        }
+        // Build References
+        for (let a = 0; a < allResources.length; a++) {
+            const ResourceSchema = allResources[a];
+            if (matchFilter(ResourceSchema)) {
+                await ResourceSchema.installReferences(this.getConnection());
+            }
+        }
+        return allResources.map(r => r.get("name"));
+
     }
 
     public async answerRequest(systemRequest: ISystemRequest): Promise<ISystemResponse> {

@@ -15,6 +15,7 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.1",
+    "module-alias": "^2.2.2",
     "mysql": "^2.18.1",
     "nanoid": "^3.1.10",
     "path-to-regexp": "^6.1.0"
@@ -40,6 +41,9 @@
     "Server",
     "Backend"
   ],
+  "_moduleAliases": {
+    "@system-resource" : "./src/resource/system"
+  },
   "author": "Nicholas Frai",
   "license": "ISC"
 }

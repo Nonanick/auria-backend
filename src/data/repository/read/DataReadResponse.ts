@@ -8,7 +8,7 @@ export class DataReadResponse implements IReadResponse {
     public success: boolean = false;
 
     constructor(request : IReadRequest) {
-        this.request = request;
+        //this.request = request;
         this.from = request.from;
     }
 

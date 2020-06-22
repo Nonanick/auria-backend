@@ -7,7 +7,7 @@ export class DataReadRequest<T = any> implements IReadRequest {
     public from!: string;
     public pick: (keyof T)[] | "*" = "*";
     public filters: { [filterName: string]: IDataFilter<T>; } = {};
-
+    public groupBy: string | string[] = "";
     protected paginationEnabled = false;
     protected _limit: number | "unlimited" = DataReadRequest.DEFAULT_PAGE_LIMIT;
     protected _page: number = 0;
@@ -70,5 +70,7 @@ export class DataReadRequest<T = any> implements IReadRequest {
     constructor(from: string) {
         this.from = from;
     }
+    procedure?: string | undefined;
+    
 
 }

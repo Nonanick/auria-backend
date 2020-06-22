@@ -1,8 +1,7 @@
 import { User } from "../../../user/User.js";
-import { DataProcedure } from "../../../database/procedures/DataProcedure.js";
 import { DataAccessPolicyFlag } from "./DataAccessPolicyFlag.js";
-import { IDataFilter } from "auria-lib";
 import { IDataFilterProvider } from "../../../database/query/IDataFilterProvider.js";
+import { ProcedureCatalog } from "../../../resource/standart/procedures/ProcedureCatalog.js";
 
 export interface IDataAccessPolicy extends IDataFilterProvider {
 
@@ -16,5 +15,5 @@ export interface IDataAccessPolicy extends IDataFilterProvider {
 export interface IResourceAccessPolicyContext {
     user : User;
     resource : string;
-    procedure : DataProcedure;    
+    procedure : keyof typeof ProcedureCatalog;    
 }

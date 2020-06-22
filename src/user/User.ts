@@ -1,11 +1,11 @@
 import { System } from "../System.js";
-import { AuriaRow } from "../database/resources/default/AuriaRow.js";
+import { AuriaRow } from "../database/schema/default/AuriaRow.js";
 import { UserAuthentication } from "./auth/UserAuthentication.js";
 import { Bootable } from "../boot/Bootable.js";
-import { ResourceCatalog } from "../database/resources/ResourceCatalog.js";
-import { IUserInfo } from "../database/rowData/IUserInfo.js";
+import { ResourceCatalog } from "../database/schema/ResourceCatalog.js";
+import { IUserInfo } from "../database/schemaInterface/IUserInfo.js";
 import { EventEmitter } from "events";
-import { IUser } from "../database/rowData/IUser.js";
+import { IUser } from "../database/schemaInterface/IUser.js";
 import { UserRoleRepository } from "./role/UserRoleRepository.js";
 import { UserDataRepository } from './data/UserDataRepository.js';
 

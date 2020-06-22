@@ -2,8 +2,8 @@ import { IExplicitPermissionFactory } from "./apiAccess/IExplicitPermissionFacto
 import { System } from "../System.js";
 import { ApiAccessRule } from "./apiAccess/AccessRule.js";
 import { ApiAccessRuleContext } from "./apiAccess/ApiAccessRuleContext.js";
-import { IApiAccess } from "../database/rowData/IApiAccess.js";
-import { ResourceCatalog } from "../database/resources/ResourceCatalog.js";
+import { IApiAccess } from "../database/schemaInterface/IApiAccess.js";
+import { ResourceCatalog } from "../database/schema/ResourceCatalog.js";
 import { User, Guest_Username } from "../user/User.js";
 
 export class ExplicitPermissionFactory implements IExplicitPermissionFactory {

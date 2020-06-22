@@ -1,1 +1,0 @@
-//# sourceMappingURL=IResourceAccessPolicy.js.map

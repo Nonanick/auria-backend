@@ -97,6 +97,7 @@ ps/
 # Built js's
 src/**/*.js
 src/*.js
+*.js
 **/*.js.map
 *.js.map
 **/*.d.ts

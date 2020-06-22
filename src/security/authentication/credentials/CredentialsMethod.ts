@@ -1,11 +1,11 @@
 import bcrypt from 'bcrypt';
 import { System } from "../../../System.js";
-import { ResourceCatalog } from "../../../database/resources/ResourceCatalog.js";
+import { ResourceCatalog } from "../../../database/schema/ResourceCatalog.js";
 import { AuthenticationFailed } from "../../../exception/system/authentication/AuthenticationFailed.js";
 import { SessionCookieLogin } from '../sessionCookie/SessionCookieLogin.js';
 import { ILoginMethod, LoginReturn } from '../interfaces/IAuthenticationMethod.js';
 import { RefererInfo } from '../../../http/RefererInfo.js';
-import { IUser } from '../../../database/rowData/IUser.js';
+import { IUser } from '../../../database/schemaInterface/IUser.js';
 
 export class CredentialsAuthentication implements ILoginMethod {
 

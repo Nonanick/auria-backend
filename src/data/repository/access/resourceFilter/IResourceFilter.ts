@@ -1,6 +1,6 @@
-import { DefaultRowData } from "../../../../database/rowData/default/DefaultRowData.js";
+import { DefaultSchemaData } from "../../../../database/schemaInterface/default/DefaultSchemaData.js";
 import { User } from "../../../../user/User.js";
 
-export interface IResourceFilter<T extends DefaultRowData> {
+export interface IResourceFilter<T extends DefaultSchemaData> {
     getFilter(user : User) : string;
 }

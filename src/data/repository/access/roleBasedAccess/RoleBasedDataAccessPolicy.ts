@@ -1,11 +1,8 @@
-import { IDataAccessPolicy, IResourceAccessPolicyContext } from "../IDataAccessPolicy.js";
-import { DataProcedure } from "../../../../database/procedures/DataProcedure.js";
-import { User } from "../../../../user/User.js";
+import { IDataAccessPolicy } from "../IDataAccessPolicy.js";
 import { QueryBuilder } from "knex";
 import { IDataFilterContext } from "../../../../database/query/IDataFilterContext.js";
-import { ResourceCatalog } from "../../../../database/resources/ResourceCatalog.js";
-import { ResourceActivity } from "../../../../database/resources/ResourceActivity.js";
-import { IResourceActivity } from "../../../../database/rowData/IResourceActivity.js";
+import { ResourceCatalog } from "../../../../database/schema/ResourceCatalog.js";
+import { IResourceActivity } from "../../../../database/schemaInterface/IResourceActivity.js";
 
 export class RoleBasedDataAccessPolicy implements IDataAccessPolicy {
 

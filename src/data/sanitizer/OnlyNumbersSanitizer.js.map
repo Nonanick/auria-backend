@@ -1,1 +1,0 @@
-{"version":3,"file":"OnlyNumbersSanitizer.js","sourceRoot":"","sources":["OnlyNumbersSanitizer.ts"],"names":[],"mappings":"AAEA;;;;;;;;GAQG;AACH,MAAM,CAAC,MAAM,oBAAoB,GAA8B,CAAC,SAAc,EAAE,EAAE;IAC9E,OAAO,MAAM,CAAC,MAAM,CAAC,SAAS,CAAC,CAAC,OAAO,CAAC,gBAAgB,EAAE,EAAE,CAAC,CAAC,CAAC;AACnE,CAAC,CAAA"}
