@@ -2,7 +2,7 @@ import { ResourceClass } from "../../ResourceClass";
 import { ResourceSchema } from "../../../database/schema/sql/ResourceSchema";
 import { PersistentLoginSchema } from "../../../database/schema/PersistentLogin.js";
 
-export class PersistenLogin extends ResourceClass {
+export class PersistentLogin extends ResourceClass {
 
     constructor() {
         super();
@@ -10,7 +10,7 @@ export class PersistenLogin extends ResourceClass {
         this.addColumns(
             // _ID
             this.buildDefaultIdColumn(),
-            
+
             // Username
             {
                 schema: {

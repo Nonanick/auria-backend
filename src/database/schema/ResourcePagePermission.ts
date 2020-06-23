@@ -3,7 +3,7 @@ import { ResourceCatalog } from "./ResourceCatalog.js";
 import { ColumnSchema } from "./sql/ColumnSchema.js";
 import { ReferenceSchema } from "./sql/ReferenceSchema.js";
 
-export class ResourcePagePermission extends ResourceSchema {
+export class ResourcePagePermissionSchema extends ResourceSchema {
 
     constructor() {
         super({
@@ -14,45 +14,6 @@ export class ResourcePagePermission extends ResourceSchema {
             is_system_resource: true,
             status: "active"
         });
-
-        this.addColumns(
-            // Page ID
-            new ColumnSchema({
-                name: "Page ID",
-                column_name: "page_id",
-                sql_type: "CHAR",
-                length : 22,
-                title: "@{Auria.Columns.ResourcePagePermission.PageID.Title}",
-                description: "@{Auria.Columns.ResourcePagePermission.PageID.Description}",
-                nullable: false,
-                column_keys : ["IND"],
-                status : "active"
-            }),
-            // User ID
-            new ColumnSchema({
-                name: "User ID",
-                column_name: "user_id",
-                sql_type: "CHAR",
-                length : 22,
-                title: "@{Auria.Columns.ResourcePagePermission.UserID.Title}",
-                description: "@{Auria.Columns.ResourcePagePermission.UserID.Description}",
-                nullable: true,
-                column_keys : ["IND"],
-                status : "active"
-            }),
-            // Role ID
-            new ColumnSchema({
-                name: "Role ID",
-                column_name: "role_id",
-                sql_type: "CHAR",
-                length : 22,
-                title: "@{Auria.Columns.ResourcePagePermission.RoleID.Title}",
-                description: "@{Auria.Columns.ResourcePagePermission.RoleID.Description}",
-                nullable: true,
-                column_keys : ["IND"],
-                status : "active"
-            }),
-        );
 
         this.addReferences(
             // Page ID

@@ -14,41 +14,5 @@ export class User extends ResourceSchema {
             status : "active"
         });
 
-        this.addColumns(
-            // Username
-            new ColumnSchema({
-                name : "Username",
-                column_name :"username",
-                sql_type : "VARCHAR",
-                title : "@{Auria.Columns.User.Username.Title}",
-                description : "@{Auria.Columns.User.Username.Description}",
-                nullable : false,
-                column_keys : ["UNI"],
-                status : "active"
-            }),
-            // Password
-            new ColumnSchema({
-                name :"Password",
-                column_name : "password",
-                sql_type : "VARCHAR",
-                title :"@{Auria.Columns.User.Password.Title}",
-                description : "@{Auria.Columns.User.Password.Description}",
-                nullable : false,
-                status : "active",
-                readable : false
-            }),
-            // User Privilege
-            new ColumnSchema({
-                name :"User Privilege",
-                column_name : "user_privilege",
-                sql_type :"INT",
-                nullable : false,
-                default_value : 1,
-                title :"@{Auria.Columns.User.UserPrivilege.Title}",
-                description : "@{Auria.Columns.User.UserPrivilege.Description}",
-                status : "active"
-            })
-        );
-
     }
 }

@@ -10,11 +10,11 @@ import { ModuleMenuSchema } from "./schema/ModuleMenuSchema.js";
 import { ModulePageSchema } from "./schema/ModulePage.js";
 import { ResourceAccessPolicy } from "./schema/ResourceAccessPolicy.js";
 import { ResourceAccessShare } from "./schema/ResourceAccessShare.js";
-import { ResourceActivity } from "./schema/ResourceActivity.js";
-import { ResourcePagePermission } from "./schema/ResourcePagePermission.js";
-import { Role } from "./schema/Role.js";
+import { ResourceHistorySchema } from "./schema/ResourceActivity.js";
+import { ResourcePagePermissionSchema } from "./schema/ResourcePagePermission.js";
+import { RoleSchema } from "./schema/Role.js";
 import { User } from "./schema/User.js";
-import { UserRole } from "./schema/UserRole.js";
+import { UserRoleSchema } from "./schema/UserRole.js";
 import { UserInfo } from "./schema/UserInfo.js";
 import { System } from "../System.js";
 import { PersistentLoginSchema } from "./schema/PersistentLogin.js";
@@ -47,13 +47,13 @@ export class ResourceManager extends EventEmitter implements Bootable {
 
             [ResourceCatalog.ResourceAccessPolicy.name]: new ResourceAccessPolicy(),
             [ResourceCatalog.ResourceAccessShare.name]: new ResourceAccessShare(),
-            [ResourceCatalog.ResourceActivity.name]: new ResourceActivity(),
-            [ResourceCatalog.ResourcePagePermission.name]: new ResourcePagePermission(),
-            [ResourceCatalog.Role.name]: new Role(),
+            [ResourceCatalog.ResourceActivity.name]: new ResourceHistorySchema(),
+            [ResourceCatalog.ResourcePagePermission.name]: new ResourcePagePermissionSchema(),
+            [ResourceCatalog.Role.name]: new RoleSchema(),
 
             [ResourceCatalog.User.name]: new User(),
             [ResourceCatalog.UserInfo.name]: new UserInfo(),
-            [ResourceCatalog.UserRole.name]: new UserRole(),
+            [ResourceCatalog.UserRole.name]: new UserRoleSchema(),
 
             [ResourceCatalog.PersistentLogin.name]: new PersistentLoginSchema()
         }

@@ -1,6 +1,5 @@
 import { ResourceSchema } from "./sql/ResourceSchema.js";
 import { ResourceCatalog } from "./ResourceCatalog.js";
-import { ColumnSchema } from "./sql/ColumnSchema.js";
 import { ReferenceSchema } from "./sql/ReferenceSchema.js";
 
 export class ResourceAccessShare extends ResourceSchema {
@@ -14,88 +13,6 @@ export class ResourceAccessShare extends ResourceSchema {
             is_system_resource: true,
             status: "active"
         });
-
-
-        this.addColumns(
-            // Resource ID
-            new ColumnSchema({
-                name: "Resource ID",
-                column_name: "resource_id",
-                sql_type: "CHAR",
-                length : 22,
-                nullable: false,
-                title: "@{Auria.Column.ResourceAccessShare.ResourceID.Title}",
-                description: "@{Auria.Column.ResourceAccessShare.ResourceID.Description}",
-                column_keys: ["IND"],
-                status: "active"
-            }),
-            // Resource Row ID
-            new ColumnSchema({
-                name: "Resource Row ID",
-                column_name: "resource_row_id",
-                sql_type: "CHAR",
-                length : 22,
-                nullable: false,
-                title: "@{Auria.Column.ResourceAccessShare.ResourceSchemaID.Title}",
-                description: "@{Auria.Column.ResourceAccessShare.ResourceSchemaID.Description}",
-                column_keys: ["IND"],
-                status: "active"
-            }),
-            // User Authority
-            new ColumnSchema({
-                name: "User Authority",
-                column_name: "user_authority",
-                sql_type: "CHAR",
-                length : 22,
-                nullable: true,
-                title: "@{Auria.Column.ResourceAccessShare.UserAuthority.Title}",
-                description: "@{Auria.Column.ResourceAccessShare.UserAuthority.Description}",
-                status: "active"
-            }),
-            // Role Authority
-            new ColumnSchema({
-                name: "Role Authority",
-                column_name: "role_authority",
-                sql_type: "CHAR",
-                length : 22,
-                nullable: true,
-                title: "@{Auria.Column.ResourceAccessShare.RoleAuthority.Title}",
-                description: "@{Auria.Column.ResourceAccessShare.RoleAuthority.Description}",
-                status: "active"
-            }),
-            // Shared With User ID
-            new ColumnSchema({
-                name: "Shared With User ID",
-                column_name: "shared_with_user_id",
-                sql_type: "CHAR",
-                length : 22,
-                nullable: true,
-                title: "@{Auria.Column.ResourceAccessShare.SharedWithUserID.Title}",
-                description: "@{Auria.Column.ResourceAccessShare.SharedWithUserID.Description}",
-                status: "active"
-            }),
-            // Shared With Role ID
-            new ColumnSchema({
-                name: "Shared With Role ID",
-                column_name: "shared_with_role_id",
-                sql_type: "CHAR",
-                length : 22,
-                nullable: true,
-                title: "@{Auria.Column.ResourceAccessShare.SharedWithRoleID.Title}",
-                description: "@{Auria.Column.ResourceAccessShare.SharedWithRoleID.Description}",
-                status: "active"
-            }),
-            // Data Procedure
-            new ColumnSchema({
-                name: "Data Procedure",
-                column_name: "data_procedure",
-                sql_type: "VARCHAR",
-                nullable: false,
-                title: "@{Auria.Column.ResourceAccessShare.DataProcedure.Title}",
-                description: "@{Auria.Column.ResourceAccessShare.DataProcedure.Description}",
-                status: "active"
-            }),
-        );
 
         this.addReferences(
             // Resource ID

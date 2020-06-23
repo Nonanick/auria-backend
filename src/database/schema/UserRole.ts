@@ -1,9 +1,8 @@
 import { ResourceSchema } from "./sql/ResourceSchema.js";
 import { ResourceCatalog } from "./ResourceCatalog.js";
-import { ColumnSchema } from "./sql/ColumnSchema.js";
 import { ReferenceSchema } from "./sql/ReferenceSchema.js";
 
-export class UserRole extends ResourceSchema {
+export class UserRoleSchema extends ResourceSchema {
     constructor() {
         super({
             name : ResourceCatalog.UserRole.name,
@@ -14,48 +13,7 @@ export class UserRole extends ResourceSchema {
             status : "active"
         });
 
-        this.addColumns(
-            // User ID
-            new ColumnSchema({
-                name : "User ID",
-                column_name : "user_id",
-                sql_type : "CHAR",
-                length : 22,
-                nullable : false,
-                column_keys : ["IND"],
-                title : "@{Auria.Columns.UserRole.UserID.Title}",
-                description : "@{Auria.Columns.UserRole.UserID.Description}",
-            }),
-            // Role ID
-            new ColumnSchema({
-                name : "Role ID",
-                column_name : "role_id",
-                sql_type : "CHAR",
-                length : 22,
-                nullable : false,
-                column_keys : ["IND"],
-                title : "@{Auria.Columns.UserRole.RoleID.Title}",
-                description : "@{Auria.Columns.UserRole.RoleID.Description}",
-            }),
-            // Name
-            new ColumnSchema({
-                name : "Name",
-                column_name : "name",
-                sql_type : "VARCHAR",
-                nullable : true,
-                title : "@{Auria.Columns.UserRole.Name.Title}",
-                description : "@{Auria.Columns.UserRole.Name.Description}",
-            }),
-            // Description
-            new ColumnSchema({
-                name : "Description",
-                column_name : "description",
-                sql_type : "VARCHAR",
-                nullable : true,
-                title : "@{Auria.Columns.UserRole.Description.Title}",
-                description : "@{Auria.Columns.UserRole.Description.Description}",
-            }),
-        );
+        
 
         this.addReferences(
             // User ID
