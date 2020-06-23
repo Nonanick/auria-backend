@@ -5,7 +5,8 @@ import { IDataType } from "./standart/dataType/IDataType.js";
 import { IGetProxy } from "./standart/getProxies/IGetProxy.js";
 import { ISetProxy } from "./standart/setProxies/ISetProxy.js";
 import { IDataValidator } from "./standart/validator/IDataValidator.js";
-import { ProcedureCatalog } from "./standart/procedures/ProcedureCatalog.js";
+import { IResourceProcedureHook } from "./standart/procedures/IResourceProcedureHook.js";
+import { IColumn } from "../database/schemaInterface/IColumn.js";
 
 export class ColumnClass extends EventEmitter implements Bootable {
 
@@ -23,22 +24,27 @@ export class ColumnClass extends EventEmitter implements Bootable {
 
     protected _dataType!: IDataType;
 
-    protected _getProxies: {
-        [procedure: string]: IGetProxy[]
-    } = {};
+    protected _getProxies: IGetProxy[] = [];
 
-    protected _setProxies: {
-        [procedure: string]: ISetProxy[]
-    } = {};
+    protected _setProxies: ISetProxy[] = [];
 
     protected _validators: {
         [procedure: string]: IDataValidator[]
     } = {};
 
+    protected _hooks: {
+        [procedure: string]: IResourceProcedureHook[]
+    } = {};
+
     constructor(params: ColumnClassParameters) {
         super();
-        this._schema = params.schema;
-        this._name = params.name ?? params.schema.get("name");
+
+        if (params.schema instanceof ColumnSchema)
+            this._schema = params.schema;
+        else
+            this._schema = new ColumnSchema(params.schema);
+
+        this._name = params.name ?? this._schema.get("name");
     }
 
     public getBootDependencies(): string[] {
@@ -57,13 +63,14 @@ export class ColumnClass extends EventEmitter implements Bootable {
 
 export interface ColumnClassParameters {
     name?: string;
-    schema: ColumnSchema;
+    schema: ColumnSchema | Partial<IColumn> & Required<Pick<IColumn, RequiredColumnParameters>>;
     dataType?: IDataType;
-    setProxies?: {
-        [procedure: string]: ISetProxy | ISetProxy[]
-    };
-    getProxies?: {
-        [procedure: string]: IGetProxy | IGetProxy[]
-    };
+    getProxies?: IGetProxy | IGetProxy[];
+    setProxies?: ISetProxy | ISetProxy[];
     validators?: IDataValidator | IDataValidator[];
+    hooks?: {
+        [procedure: string]: IResourceProcedureHook | IResourceProcedureHook[]
+    };
 }
+
+type RequiredColumnParameters = "column_name" | "name" | "sql_type";

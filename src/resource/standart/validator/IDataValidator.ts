@@ -1,3 +1,1 @@
-export interface IDataValidator {
-    
-}
+export type IDataValidator = (value : any) => boolean | Promise<boolean> | string | Promise<string>;

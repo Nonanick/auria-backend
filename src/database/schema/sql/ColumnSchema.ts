@@ -192,4 +192,4 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
     }
 }
 
-type RequiredColumnParameters = "column_name" | "name" | "sql_type";
+export type RequiredColumnParameters = "column_name" | "name" | "sql_type";

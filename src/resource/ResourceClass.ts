@@ -2,15 +2,15 @@ import Knex from "knex";
 import { Bootable } from "../boot/Bootable.js";
 import { EventEmitter } from "events";
 import { ResourceSchema } from "../database/schema/sql/ResourceSchema.js";
-import { Reference } from "./Reference.js";
 import { IResourceFacade } from "./standart/facade/IResourceFacade.js";
 import { IResourceProcedure } from "./standart/procedures/IResourceProcedure.js";
 import { IResourceAccessRule } from "./standart/accessRules/IResourceAccessRule.js";
 import { IDataFilterProvider } from "../database/query/IDataFilterProvider.js";
-import { ColumnClass } from "./ColumnClass.js";
+import { ColumnClass, ColumnClassParameters } from "./ColumnClass.js";
 import { ColumnSchema } from "../database/schema/sql/ColumnSchema.js";
 import { nanoid } from "nanoid";
 import { ProcedureCatalog } from "./standart/procedures/ProcedureCatalog.js";
+import { ReferenceClass } from "./ReferenceClass.js";
 
 export abstract class ResourceClass extends EventEmitter implements Bootable {
 
@@ -24,7 +24,7 @@ export abstract class ResourceClass extends EventEmitter implements Bootable {
 
     protected _schema!: ResourceSchema;
 
-    public get schema() : ResourceSchema {
+    public get schema(): ResourceSchema {
         return this._schema;
     }
 
@@ -41,7 +41,7 @@ export abstract class ResourceClass extends EventEmitter implements Bootable {
     } = {};
 
     protected _references: {
-        [name: string]: Reference
+        [name: string]: ReferenceClass
     } = {};
 
     protected _facades: {
@@ -53,44 +53,84 @@ export abstract class ResourceClass extends EventEmitter implements Bootable {
         this._schema = this.buildSchema();
     }
 
-    protected buildDefaultIdColumn() : ColumnClass {
+    protected buildDefaultIdColumn(): ColumnClass {
         return new ColumnClass({
-            name : "ID",
-            schema : new ColumnSchema({
-                name : "ID",
-                column_name : "_id",
-                sql_type : "CHAR",
-                length : 22,
-                column_keys : ["PRI"],
-                data_type : "IDColumn",
-                title : "@{Auria.Defaults.IdColumn.Title}",
-                description : "@{Auria.Defaults.IdColumn.Description}",
-                nullable : false,
-                readable : true,
-                required : true,
-                status : "active"
+            name: "ID",
+            schema: new ColumnSchema({
+                name: "ID",
+                column_name: "_id",
+                sql_type: "CHAR",
+                length: 22,
+                column_keys: ["PRI"],
+                data_type: "IDColumn",
+                title: "@{Auria.Defaults.IdColumn.Title}",
+                description: "@{Auria.Defaults.IdColumn.Description}",
+                nullable: false,
+                readable: true,
+                required: true,
+                status: "active"
             }),
-            getProxies : {
-                [ProcedureCatalog.CREATE] : () => nanoid(22)
+            // Generate an nanoid everytime _id is requested and is null
+            getProxies: (value) => {
+                if (value == null)
+                    return nanoid(22);
+                return value;
+            },
+            hooks: {
+                // Before INSERT make sure _id is not null!
+                [ProcedureCatalog.CREATE]: (context) => {
+                    if (context.procedureData._id == null)
+                        context.procedureData._id = nanoid(22);
+                }
+            },
+
+        });
+    }
+
+    protected buildDefaultStatusColumn(): ColumnClass {
+        return new ColumnClass({
+            schema: new ColumnSchema({
+                name: "Status",
+                column_name: "status",
+                sql_type: "VARCHAR",
+                title: "@{Auria.Defaults.StatusColumn.Title}",
+                description: "@{Auria.Defaults.StatusColumn.Description}",
+                nullable: false,
+                default_value: "active",
+                readable: false,
+                required: true,
+                status: "active"
+            }),
+            validators: (value) => {
+                const validStatus = ["active", "inactive"];
+                return validStatus.includes(value) ? true : "'Status' column only accepts " + validStatus.join(" , ");
             }
         });
     }
 
-    public addColumns(...columns: ColumnClass[]) {
+    public addColumns(...columns: (ColumnClass | ColumnClassParameters)[]) {
 
         if (Array.isArray(columns)) {
             for (let column of columns) {
-                this._columns[column.name] = column;
-                this._schema.addColumns(column.schema);
+                let obj: ColumnClass; //TS complaining...
+                if (!(column instanceof ColumnClass)) {
+                    obj = new ColumnClass(column);
+                } else {
+                    obj = column;
+                }
+
+                this._columns[obj.schema.get("name")] = obj;
+                this._schema.addColumns(obj.schema);
             }
         }
     }
 
-    public addReferences(...references: Reference[]) {
+    public addReferences(...references: ReferenceClass[]) {
 
         if (Array.isArray(references)) {
 
             for (let reference of references) {
+
                 this._references[reference.name] = reference;
                 this._schema.addReferences(reference.schema);
             }
@@ -108,7 +148,7 @@ export abstract class ResourceClass extends EventEmitter implements Bootable {
 
     public getFilterProviderForProcedure(procedure: string): IDataFilterProvider {
         return {
-            applyFilter : async (query, context) => {
+            applyFilter: async (query, context) => {
                 return query;
             }
         }
@@ -116,7 +156,11 @@ export abstract class ResourceClass extends EventEmitter implements Bootable {
 
 
     public abstract getBootDependencies(): string[];
-    public abstract getBootableName(): string;
+    
+    public getBootableName(): string {
+        return `BootOfResource(${this.schema.get("name")})`;
+    }
+
     public abstract getBootFunction(): () => boolean | Promise<boolean>;
 
     protected abstract buildSchema(): ResourceSchema;

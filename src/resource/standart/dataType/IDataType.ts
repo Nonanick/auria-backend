@@ -5,21 +5,16 @@ import { IResourceProcedureHook } from "../procedures/IResourceProcedureHook.js"
 
 export interface IDataType {
 
-    name : string;
-    
-    procedureHooks? : {
-        [procedure : string] : IResourceProcedureHook[]
+    name: string;
+
+    procedureHooks?: {
+        [procedure: string]: IResourceProcedureHook | IResourceProcedureHook[]
     };
 
-    getProxies? : {
-        [procedure : string] : IGetProxy[]
-    };
+    getProxies?: IGetProxy[];
 
-    setProxies? : {
-        [procedure : string] : ISetProxy[]
-    };
+    setProxies?: ISetProxy[];
 
-    validators? : IDataValidator[];
+    validators?: IDataValidator[];
 
-    
 }

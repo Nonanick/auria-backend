@@ -14,7 +14,19 @@ export class ReferenceClass extends EventEmitter {
         return this._schema;
     }
 
-    constructor() {
+    constructor(params : ReferenceClassParameters) {
         super();
+        this._schema = params.schema;
     }
+}
+
+export interface ReferenceClassParameters {
+    schema : ReferenceSchema;
+}
+
+export interface IResourceReference {
+    name : string;
+    column: string;
+    referencedColumn : string;
+    referencedTable : string;
 }
