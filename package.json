@@ -8,7 +8,7 @@
     "test": "tests"
   },
   "dependencies": {
-    "auria-lib": "link:../auria-libs/",
+    "auria-lib": "link:..\\auria-libs",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
@@ -42,7 +42,7 @@
     "Backend"
   ],
   "_moduleAliases": {
-    "@system-resource" : "./src/resource/system"
+    "@system-resource": "./src/resource/system"
   },
   "author": "Nicholas Frai",
   "license": "ISC"

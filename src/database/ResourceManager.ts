@@ -6,8 +6,8 @@ import { Column as ColumnInstance } from './schema/Column.js';
 import { ResourceCatalog } from "./schema/ResourceCatalog.js";
 import { Connection } from "./schema/Connection.js";
 import { Module } from "./schema/Module.js";
-import { ModuleMenu } from "./schema/ModuleMenu.js";
-import { ModulePage } from "./schema/ModulePage.js";
+import { ModuleMenuSchema } from "./schema/ModuleMenuSchema.js";
+import { ModulePageSchema } from "./schema/ModulePage.js";
 import { ResourceAccessPolicy } from "./schema/ResourceAccessPolicy.js";
 import { ResourceAccessShare } from "./schema/ResourceAccessShare.js";
 import { ResourceActivity } from "./schema/ResourceActivity.js";
@@ -17,7 +17,7 @@ import { User } from "./schema/User.js";
 import { UserRole } from "./schema/UserRole.js";
 import { UserInfo } from "./schema/UserInfo.js";
 import { System } from "../System.js";
-import { PersistentLogin } from "./schema/PersistentLogin.js";
+import { PersistentLoginSchema } from "./schema/PersistentLogin.js";
 import { ApiAccess } from "./schema/ApiAccess.js";
 import { ResourceSchema } from "./schema/sql/ResourceSchema.js";
 
@@ -42,8 +42,8 @@ export class ResourceManager extends EventEmitter implements Bootable {
             // Free zone, go on be happy!
             [ResourceCatalog.ApiAccess.name]: new ApiAccess(),
             [ResourceCatalog.Module.name]: new Module(),
-            [ResourceCatalog.ModuleMenu.name]: new ModuleMenu(),
-            [ResourceCatalog.ModulePage.name]: new ModulePage(),
+            [ResourceCatalog.ModuleMenu.name]: new ModuleMenuSchema(),
+            [ResourceCatalog.ModulePage.name]: new ModulePageSchema(),
 
             [ResourceCatalog.ResourceAccessPolicy.name]: new ResourceAccessPolicy(),
             [ResourceCatalog.ResourceAccessShare.name]: new ResourceAccessShare(),
@@ -55,7 +55,7 @@ export class ResourceManager extends EventEmitter implements Bootable {
             [ResourceCatalog.UserInfo.name]: new UserInfo(),
             [ResourceCatalog.UserRole.name]: new UserRole(),
 
-            [ResourceCatalog.PersistentLogin.name]: new PersistentLogin()
+            [ResourceCatalog.PersistentLogin.name]: new PersistentLoginSchema()
         }
 
         for (let name in this.resources) {

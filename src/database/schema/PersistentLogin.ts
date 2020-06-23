@@ -3,7 +3,7 @@ import { ResourceCatalog } from './ResourceCatalog.js';
 import { ColumnSchema } from './sql/ColumnSchema.js';
 import { ReferenceSchema } from './sql/ReferenceSchema.js';
 
-export class PersistentLogin extends ResourceSchema {
+export class PersistentLoginSchema extends ResourceSchema {
 
     constructor() {
         super({
@@ -13,54 +13,6 @@ export class PersistentLogin extends ResourceSchema {
             description: "@{Auria.Resources.Session.Description}",
             is_system_resource: true,
         });
-
-
-        this.addColumns(
-            // Username
-            new ColumnSchema({
-                name: "Username",
-                column_name: "username",
-                sql_type: "VARCHAR",
-                column_keys: ["IND"],
-                nullable: false,
-                title: "@{Auria.Columns.Session.Username.Title}",
-                description: "@{Auria.Columns.Session.Username.Description}",
-                resource_id: this.get("_id")
-            }),
-            // Token
-            new ColumnSchema({
-                name: "Token",
-                column_name: "token",
-                sql_type: "TEXT",
-                nullable: false,
-                title: "@{Auria.Columns.Session.Token.Title}",
-                description: "@{Auria.Columns.Session.Token.Description}",
-                resource_id: this.get("_id")
-            }),
-            // Referer Identification
-            new ColumnSchema({
-                name: "Referer Identification",
-                column_name: "referer_identification",
-                sql_type: "TEXT",
-                nullable: false,
-                title: "@{Auria.Columns.Session.MachineIp.Title}",
-                description: "@{Auria.Columns.Session.MachineIp.Description}",
-                resource_id: this.get("_id"),
-                default_value: "IP_NOT_PROVIDED",
-            }),
-         
-            // Login Time
-            new ColumnSchema({
-                name: "Login Time",
-                column_name: "login_time",
-                sql_type: "DATETIME",
-                nullable: false,
-                title: "@{Auria.Columns.Session.LoginTime.Title}",
-                description: "@{Auria.Columns.Session.LoginTime.Description}",
-                resource_id: this.get("_id"),
-            }),
-
-        );
 
         this.addReferences(
             new ReferenceSchema(this, {
