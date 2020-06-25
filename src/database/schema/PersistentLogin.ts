@@ -1,27 +1,27 @@
-import { ResourceSchema } from './sql/ResourceSchema.js';
-import { ResourceCatalog } from './ResourceCatalog.js';
+import { EntitySchema } from './sql/EntitySchema.js';
+import { EntityCatalog } from './EntityCatalog.js';
 import { ColumnSchema } from './sql/ColumnSchema.js';
 import { ReferenceSchema } from './sql/ReferenceSchema.js';
 
-export class PersistentLoginSchema extends ResourceSchema {
+export class PersistentLoginSchema extends EntitySchema {
 
     constructor() {
         super({
-            name: ResourceCatalog.PersistentLogin.name,
-            table_name: ResourceCatalog.PersistentLogin.table_name,
-            title: "@{Auria.Resources.Session.Title}",
-            description: "@{Auria.Resources.Session.Description}",
-            is_system_resource: true,
+            name: EntityCatalog.PersistentLogin.name,
+            table_name: EntityCatalog.PersistentLogin.table_name,
+            title: "@{Auria.Entitys.Session.Title}",
+            description: "@{Auria.Entitys.Session.Description}",
+            is_system_entity: true,
         });
 
         this.addReferences(
             new ReferenceSchema(this, {
                 name: "Username_Has_Persistent_Login",
-                resource_id: this.get("_id"),
-                resource_table_name: this.get("table_name"),
-                resource_column_name: "username",
+                entity_id: this.get("_id"),
+                entity_table_name: this.get("table_name"),
+                entity_column_name: "username",
 
-                reference_table_name: ResourceCatalog.User.table_name,
+                reference_table_name: EntityCatalog.User.table_name,
                 reference_column_name: "username"
             })
         );

@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { ResourceManager } from "./database/ResourceManager.js";
+import { EntityManager } from "./database/EntityManager.js";
 import { DupplicatedURI } from "./exception/system/DupplicatedURI.js";
 import { ModuleManager } from "./module/ModuleManager.js";
 import { AuriaException, ISystemResponse } from "auria-lib";
@@ -17,12 +17,13 @@ import { IApiListener } from "./api/IApiListener.js";
 import { SystemConfiguration } from "./SystemConfiguration.js";
 import { ApiRouteMetadata } from "./api/ExposedApiEnpointsMetadata.js";
 import { ApiAccessRule } from "./security/apiAccess/AccessRule.js";
-import { ResourceSchema } from "./database/schema/sql/ResourceSchema.js";
+import { EntitySchema } from "./database/schema/sql/EntitySchema.js";
 import { ISystemRequest } from "./http/ISystemRequest.js";
 import Knex from "knex";
 import { BootSequence } from "./boot/BootSequence.js";
 import { DataListener } from "./api/system/data/DataListener.js";
 import { DataRepository } from './data/repository/DataRepository.js';
+import { ConnectionDefinition } from "./database/connection/ConnectionDefinition.js";
 
 export abstract class System extends EventEmitter implements IApiListener {
 
@@ -69,7 +70,7 @@ export abstract class System extends EventEmitter implements IApiListener {
     };
 
     protected _configuration: SystemConfiguration;
-    protected _resourceManager: ResourceManager;
+    protected _entityManager: EntityManager;
     protected _moduleManager: ModuleManager;
     protected _users: UserManager;
     protected _authenticator: Authenticator;
@@ -95,7 +96,7 @@ export abstract class System extends EventEmitter implements IApiListener {
             triggerEvent: SystemEvents.BOOT
         });
 
-        this._resourceManager = new ResourceManager(this);
+        this._entityManager = new EntityManager(this);
         this._moduleManager = new ModuleManager(this);
         this._users = new UserManager(this);
         this._authenticator = new Authenticator(this);
@@ -109,7 +110,25 @@ export abstract class System extends EventEmitter implements IApiListener {
 
     }
 
-    public abstract getConnection(): Knex;
+    public abstract getConnectionDefinition(): ConnectionDefinition;
+
+    public getConnection() : Knex {
+
+        const definition = this.getConnectionDefinition();
+        
+        return Knex({
+            client : definition.client,
+            connection : {
+                driver : definition.client,
+                host : definition.host,
+                user : definition.user,
+                password : definition.password,
+                database : definition.database,
+                port : definition.port,
+
+            }
+        });
+    }
 
     public get name(): string {
         return this._name;
@@ -208,8 +227,8 @@ export abstract class System extends EventEmitter implements IApiListener {
         }
     }
 
-    public resourceManager() {
-        return this._resourceManager;
+    public entityManager() {
+        return this._entityManager;
     }
 
     public authenticator() {
@@ -224,41 +243,41 @@ export abstract class System extends EventEmitter implements IApiListener {
         return this._data;
     }
 
-    public async install(filterResource?: string) {
+    public async install(filterEntity?: string) {
 
-        const filter = filterResource || "";
+        const filter = filterEntity || "";
 
-        const matchFilter = (name: ResourceSchema) => {
+        const matchFilter = (name: EntitySchema) => {
             return filter == ""
                 || String(name.get("name")).toLocaleLowerCase().indexOf(filter.toLocaleLowerCase()) >= 0;
         };
 
-        const allResources = this.resourceManager().getAllResources();
+        const allEntities = this.entityManager().getAllEntities();
         // Build Schema
-        for (let a = 0; a < allResources.length; a++) {
-            const ResourceSchema = allResources[a];
-            if (matchFilter(ResourceSchema))
-                await ResourceSchema.install(this.getConnection());
+        for (let a = 0; a < allEntities.length; a++) {
+            const EntitySchema = allEntities[a];
+            if (matchFilter(EntitySchema))
+                await EntitySchema.install(this.getConnection());
         }
         // Register as Rows
-        for (let b = 0; b < allResources.length; b++) {
-            const ResourceSchema = allResources[b];
-            if (matchFilter(ResourceSchema)) {
-                await ResourceSchema.save();
-                let cols = ResourceSchema.getColumns();
+        for (let b = 0; b < allEntities.length; b++) {
+            const EntitySchema = allEntities[b];
+            if (matchFilter(EntitySchema)) {
+                await EntitySchema.save();
+                let cols = EntitySchema.getColumns();
                 for (let c = 0; c < cols.length; c++) {
                     await cols[c].save();
                 }
             }
         }
         // Build References
-        for (let a = 0; a < allResources.length; a++) {
-            const ResourceSchema = allResources[a];
-            if (matchFilter(ResourceSchema)) {
-                await ResourceSchema.installReferences(this.getConnection());
+        for (let a = 0; a < allEntities.length; a++) {
+            const EntitySchema = allEntities[a];
+            if (matchFilter(EntitySchema)) {
+                await EntitySchema.installReferences(this.getConnection());
             }
         }
-        return allResources.map(r => r.get("name"));
+        return allEntities.map(r => r.get("name"));
 
     }
 

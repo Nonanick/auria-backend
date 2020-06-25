@@ -14,7 +14,7 @@ export class DataRepository {
     constructor(private system: System) { }
 
     public async read(user: User, request: IReadRequest): Promise<IReadResponse> {
-        const resource = this.system.resourceManager().getResource(request.from);
+        const enitty = this.system.entityManager().getEntity(request.from);
 
         let procedure = "FETCH"; // Default procedure
 
@@ -26,6 +26,6 @@ export class DataRepository {
 
         return DataRepository.ReadProcedures
         [procedure as keyof typeof DataRepository.ReadProcedures]
-            .processRequest(request, resource, user);
+            .processRequest(request, enitty, user);
     }
 }

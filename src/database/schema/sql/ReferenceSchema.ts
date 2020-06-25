@@ -1,17 +1,14 @@
 import { DefaultSchema } from "../default/DefaultRow.js";
 import Knex from "knex";
-import { ResourceSchema } from "./ResourceSchema.js";
-import { ResourceCatalog } from "../ResourceCatalog.js";
-import { IResourceReference } from "../../schemaInterface/IResourceReference.js";
+import { EntityCatalog } from "../EntityCatalog.js";
+import { IEntityReference } from "../../schemaInterface/IEntityReference.js";
 
-export class ReferenceSchema extends DefaultSchema<IResourceReference> {
+export class ReferenceSchema extends DefaultSchema<IEntityReference> {
 
-    protected resource: ResourceSchema;
 
-    constructor(resource: ResourceSchema, data: Omit<Required<IResourceReference>, "_id" | "status">) {
+    constructor(data?: Omit<Required<IEntityReference>, "_id" | "status">) {
         super(data);
         this.get("_id");
-        this.resource = resource;
     }
 
 
@@ -20,8 +17,8 @@ export class ReferenceSchema extends DefaultSchema<IResourceReference> {
         if (this.connection == null)
             this.connection = connection;
             
-        // Update Resource ID (Might have changed if resource was synced with DB definition!)
-        this.set("resource_id", this.resource.get("_id"));
+        // Update Entity ID (Might have changed if entity was synced with DB definition!)
+        //this.set("entity_id", this.entity.get("_id"));
 
         return this.keyExistsOnInformationSchema(connection)
             .then(async (exists) => {
@@ -36,25 +33,25 @@ export class ReferenceSchema extends DefaultSchema<IResourceReference> {
                 if (!exists) {
                     await connection
                         .insert(data)
-                        .into(ResourceCatalog.Reference.table_name)
+                        .into(EntityCatalog.Reference.table_name)
                         .then((inserted) => {
                             console.log("[ReferenceSchema] Key inserted into Auria Reference!", inserted);
                         });
                 } else {
                     delete data._id;
-                    await connection.table(ResourceCatalog.Reference.table_name)
+                    await connection.table(EntityCatalog.Reference.table_name)
                         .update(data)
                         .where("_id", this.get("_id"))
                         .then((updated) => {
                             console.log("[ReferenceSchema] Key updated into Auria Reference!", updated);
                         });
                 }
-                await connection.table(ResourceCatalog.Column.table_name)
+                await connection.table(EntityCatalog.Column.table_name)
                     .update({
                         reference_id: this.get("_id")
                     })
-                    .where("resource_id", this.resource.get("_id"))
-                    .where("column_name", this.get("resource_column_name"))
+                    //.where("entity_id", this.entity.get("_id"))
+                    .where("column_name", this.get("entity_column_name"))
                     .then((updated) => {
                         console.log("[ReferenceSchema] Reference ID updated into Auria Column!", updated);
                     });
@@ -68,8 +65,8 @@ export class ReferenceSchema extends DefaultSchema<IResourceReference> {
             // Check for key in Information  Schema
             .select('*')
             .from('key_column_usage')
-            .where('table_name', this.get("resource_table_name"))
-            .where('column_name', this.get("resource_column_name"))
+            .where('table_name', this.get("entity_table_name"))
+            .where('column_name', this.get("entity_column_name"))
             .where('referenced_table_schema', this.connection.client.database())
             .where('referenced_table_name', this.get("reference_table_name"))
             .where('referenced_column_name', this.get('reference_column_name'))
@@ -82,10 +79,10 @@ export class ReferenceSchema extends DefaultSchema<IResourceReference> {
         return this.connection.withSchema(connection.client.database())
             // Check for key in Information  Schema
             .select('*')
-            .from(ResourceCatalog.Reference.table_name)
-            .where('resource_id', this.resource.get("_id"))
-            .where('resource_table_name', this.get("resource_table_name"))
-            .where('resource_column_name', this.get("resource_column_name"))
+            .from(EntityCatalog.Reference.table_name)
+            //.where('entity_id', this.entity.get("_id"))
+            .where('entity_table_name', this.get("entity_table_name"))
+            .where('entity_column_name', this.get("entity_column_name"))
             .where('reference_table_name', this.get("reference_table_name"))
             .where('reference_column_name', this.get('reference_column_name'))
             .then(async (auriaReferences) => {
@@ -102,9 +99,9 @@ export class ReferenceSchema extends DefaultSchema<IResourceReference> {
         try {
             await connection.schema
                 .raw(`
-                    ALTER TABLE ${this.resource.get("table_name")} 
+                    ALTER TABLE ${this.get("entity_table_name")} 
                     ADD CONSTRAINT ${this.get("name")}
-                    FOREIGN KEY (${this.get("resource_column_name")})
+                    FOREIGN KEY (${this.get("entity_column_name")})
                     REFERENCES ${this.get('reference_table_name')}(${this.get("reference_column_name")})
                     `)
         } catch (err) {

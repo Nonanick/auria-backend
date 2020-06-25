@@ -1,10 +1,10 @@
 import { User } from "../../user/User.js";
-import { ResourceSchema } from "../schema/sql/ResourceSchema.js";
+import { EntitySchema } from "../schema/sql/EntitySchema.js";
 
 export interface IDataFilterContext {
     user : User;
     procedure : string;
-    resource : ResourceSchema;
+    entity : EntitySchema;
     roles : string[];
     avaliableColumns : string[];
 }

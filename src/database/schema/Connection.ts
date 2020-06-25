@@ -1,15 +1,15 @@
-import { ResourceCatalog } from "./ResourceCatalog.js";
-import { ResourceSchema } from "./sql/ResourceSchema.js";
+import { EntityCatalog } from "./EntityCatalog.js";
+import { EntitySchema } from "./sql/EntitySchema.js";
 
-export class Connection extends ResourceSchema {
+export class Connection extends EntitySchema {
 
     constructor() {
         super({
-            name: ResourceCatalog.Connection.name,
-            table_name: ResourceCatalog.Connection.table_name,
-            title: "@{Auria.Resource.Connection.Title}",
-            description: "@{Auria.Resource.Connection.Description}",
-            is_system_resource: true,
+            name: EntityCatalog.Connection.name,
+            table_name: EntityCatalog.Connection.table_name,
+            title: "@{Auria.Entity.Connection.Title}",
+            description: "@{Auria.Entity.Connection.Description}",
+            is_system_entity: true,
             status: "active"
         });
 

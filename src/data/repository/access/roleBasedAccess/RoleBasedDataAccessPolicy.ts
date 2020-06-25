@@ -1,8 +1,8 @@
 import { IDataAccessPolicy } from "../IDataAccessPolicy.js";
 import { QueryBuilder } from "knex";
 import { IDataFilterContext } from "../../../../database/query/IDataFilterContext.js";
-import { ResourceCatalog } from "../../../../database/schema/ResourceCatalog.js";
-import { IResourceActivity } from "../../../../database/schemaInterface/IResourceActivity.js";
+import { EntityCatalog } from "../../../../database/schema/EntityCatalog.js";
+import { IEntityActivity } from "../../../../database/schemaInterface/IEntityActivity.js";
 
 export class RoleBasedDataAccessPolicy implements IDataAccessPolicy {
 
@@ -38,11 +38,11 @@ export class RoleBasedDataAccessPolicy implements IDataAccessPolicy {
         switch (context.procedure) {
             default:
                 query.whereIn(
-                    context.resource.getRowPrimaryField(),
+                    context.entity.getRowPrimaryField(),
                     function () {
-                        this.table(ResourceCatalog.ResourceActivity.table_name)
-                            .select<IResourceActivity>("resource_row_id")
-                            .where("resource_id", context.resource.get("_id"))
+                        this.table(EntityCatalog.EntityActivity.table_name)
+                            .select<IEntityActivity>("entity_row_id")
+                            .where("entity_id", context.entity.get("_id"))
                             .whereIn("role_id", roles)
                             .orWhereIn("role_authority", roles)
                     }

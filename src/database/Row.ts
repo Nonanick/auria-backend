@@ -62,9 +62,9 @@ export class Row<T = any> extends EventEmitter {
      * chain use the previous value! Errors raised will NOT
      * stop the chain
      */
-    private getProxies: Map<keyof T, ResourceGetProxy[]>;
+    private getProxies: Map<keyof T, EntityGetProxy[]>;
 
-    private setProxies: Map<keyof T, ResourceSetProxy[]>;
+    private setProxies: Map<keyof T, EntitySetProxy[]>;
 
     constructor(data?: Partial<T>) {
         super();
@@ -176,14 +176,14 @@ export class Row<T = any> extends EventEmitter {
         return this;
     }
 
-    public addGetProxy(propName: keyof T, getProxy: ResourceGetProxy) {
+    public addGetProxy(propName: keyof T, getProxy: EntityGetProxy) {
         if (!this.getProxies.has(propName)) {
             this.getProxies.set(propName, []);
         }
         this.getProxies.get(propName)!.push(getProxy);
     }
 
-    public removeGetProxy(propName: keyof T, getProxy: ResourceGetProxy) {
+    public removeGetProxy(propName: keyof T, getProxy: EntityGetProxy) {
         if (this.getProxies.has(propName)) {
             const proxies = this.getProxies.get(propName)!;
             const iOProxy = proxies.indexOf(getProxy);
@@ -198,14 +198,14 @@ export class Row<T = any> extends EventEmitter {
         return this;
     }
 
-    public addSetProxy(propName: keyof T, setProxy: ResourceSetProxy) {
+    public addSetProxy(propName: keyof T, setProxy: EntitySetProxy) {
         if (!this.setProxies.has(propName)) {
             this.setProxies.set(propName, []);
         }
         this.setProxies.get(propName)!.push(setProxy);
     }
 
-    public removeSetProxy(propName: keyof T, setProxy: ResourceSetProxy) {
+    public removeSetProxy(propName: keyof T, setProxy: EntitySetProxy) {
         if (this.setProxies.has(propName)) {
             const proxies = this.setProxies.get(propName)!;
             const iOProxy = proxies.indexOf(setProxy);
@@ -355,7 +355,7 @@ export class Row<T = any> extends EventEmitter {
 
 type RowSyncControlState = "NOT_ON_DATABASE" | "SYNCED" | "UNSYNCED";
 
-export type ResourceGetProxy = (value: any) => Promise<any> | any;
-export type ResourceSetProxy = (value: any, abort: ResourceAbortSetOperation) => any | Promise<any>;
+export type EntityGetProxy = (value: any) => Promise<any> | any;
+export type EntitySetProxy = (value: any, abort: EntityAbortSetOperation) => any | Promise<any>;
 
-export type ResourceAbortSetOperation = (messageOrException: string | Error) => void;
+export type EntityAbortSetOperation = (messageOrException: string | Error) => void;

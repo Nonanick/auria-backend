@@ -8,7 +8,7 @@ class KnexFilterAdapterClass implements IDataFilterProvider {
     public async applyFilter(query: QueryBuilder, filters: { [name: string]: IDataFilter }, context: IDataFilterContext) {
         for (let name in filters) {
             const filter = filters[name];
-            if (context.resource.hasColumn(String(filter.column))) {
+            if (context.entity.hasColumn(String(filter.column))) {
                 this.handleComparison(query, filter);
             } else {
                 console.error("[FilterAdapter] WARN! Failed to apply filter '", name, "' column does not exists in Auria!");

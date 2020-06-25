@@ -2,7 +2,7 @@ import { System } from "../System.js";
 import { AuriaRow } from "../database/schema/default/AuriaRow.js";
 import { UserAuthentication } from "./auth/UserAuthentication.js";
 import { Bootable } from "../boot/Bootable.js";
-import { ResourceCatalog } from "../database/schema/ResourceCatalog.js";
+import { EntityCatalog } from "../database/schema/EntityCatalog.js";
 import { IUserInfo } from "../database/schemaInterface/IUserInfo.js";
 import { EventEmitter } from "events";
 import { IUser } from "../database/schemaInterface/IUser.js";
@@ -108,8 +108,8 @@ export class User extends EventEmitter implements Bootable {
         if (this.username !== Guest_Username) {
 
             this._loadedPromise = system
-                .resourceManager()
-                .getResource(ResourceCatalog.User.name)
+                .entityManager()
+                .getEntity(EntityCatalog.User.name)
                 .createRow<IUser>(username, "username")
                 .then((userRow) => {
                     this.userRow = userRow;
@@ -180,8 +180,8 @@ export class User extends EventEmitter implements Bootable {
 
             // TODO boot user routine
             this.info = await this.system
-                .resourceManager()
-                .getResource(ResourceCatalog.UserInfo.name)
+                .entityManager()
+                .getEntity(EntityCatalog.UserInfo.name)
                 .createRow<IUserInfo>(this.userRow.get("_id"), "user_id");
 
             this.rolesRepo = new UserRoleRepository(this.system, this);

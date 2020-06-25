@@ -1,15 +1,15 @@
 import { DefaultSchema } from "./DefaultRow.js";
-import { ResourceSchema } from "../sql/ResourceSchema.js";
+import { EntitySchema } from "../sql/EntitySchema.js";
 import { DefaultSchemaData } from "../../schemaInterface/default/DefaultSchemaData.js";
 
 export class AuriaRow<T extends DefaultSchemaData> extends DefaultSchema<T> {
 
-    private resource: ResourceSchema;
+    private entity: EntitySchema;
 
-    constructor(resource: ResourceSchema, data?: Partial<T>) {
+    constructor(entity: EntitySchema, data?: Partial<T>) {
         super(data);
-        this.resource = resource;
-        this.setTableName(resource.get("table_name"));
+        this.entity = entity;
+        this.setTableName(entity.get("table_name"));
         this.setRowState("NOT_ON_DATABASE");
     }
 
@@ -18,7 +18,7 @@ export class AuriaRow<T extends DefaultSchemaData> extends DefaultSchema<T> {
 
         return this.connection
             .select<T[]>('*')
-            .from(this.resource.get("table_name"))
+            .from(this.entity.get("table_name"))
             .where(searchColumn as string, id)
             .then((res) => {
                 if (res.length === 1) {
@@ -26,7 +26,7 @@ export class AuriaRow<T extends DefaultSchemaData> extends DefaultSchema<T> {
                     this.setRowState("SYNCED");
                 }
                 else {
-                    console.error("[AuriaRow] Failed to pinpoint row with id ", id, ' in Table ', this.resource.get("table_name"), ' searched in column', column);
+                    console.error("[AuriaRow] Failed to pinpoint row with id ", id, ' in Table ', this.entity.get("table_name"), ' searched in column', column);
                 }
 
                 return this;

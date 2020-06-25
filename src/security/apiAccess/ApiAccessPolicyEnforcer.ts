@@ -101,7 +101,7 @@ export class ApiAccessPolicyEnforcer {
                 request
             };
 
-            // Resolve local Api Resource Rules
+            // Resolve local Api Entity Rules
             if (Array.isArray(accessRules)) {
                 let promiseMap = accessRules.map(rule => rule(apiContext));
                 return Promise.all(promiseMap)

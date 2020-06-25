@@ -1,16 +1,16 @@
-import { ResourceSchema } from "./sql/ResourceSchema.js";
-import { ResourceCatalog } from "./ResourceCatalog.js";
+import { EntitySchema } from "./sql/EntitySchema.js";
+import { EntityCatalog } from "./EntityCatalog.js";
 import { ColumnSchema } from "./sql/ColumnSchema.js";
 import { ReferenceSchema } from "./sql/ReferenceSchema.js";
 
-export class UserInfo extends ResourceSchema {
+export class UserInfo extends EntitySchema {
     constructor() {
         super({
-            name: ResourceCatalog.UserInfo.name,
-            table_name: ResourceCatalog.UserInfo.table_name,
-            title: "@{Auria.Resource.UserInfo.Title}",
-            description: "@{Auria.Resource.UserInfo.Description}",
-            is_system_resource: true,
+            name: EntityCatalog.UserInfo.name,
+            table_name: EntityCatalog.UserInfo.table_name,
+            title: "@{Auria.Entity.UserInfo.Title}",
+            description: "@{Auria.Entity.UserInfo.Description}",
+            is_system_entity: true,
             status: "active"
         });
 
@@ -80,12 +80,12 @@ export class UserInfo extends ResourceSchema {
 
                 name: "Info_Belongs_To_User",
                 // Source info
-                resource_id: this.get("_id"),
-                resource_table_name: this.get("table_name"),
-                resource_column_name: "user_id",
+                entity_id: this.get("_id"),
+                entity_table_name: this.get("table_name"),
+                entity_column_name: "user_id",
 
                 // Reference info
-                reference_table_name: ResourceCatalog.User.table_name,
+                reference_table_name: EntityCatalog.User.table_name,
                 reference_column_name: "_id"
             })
         );

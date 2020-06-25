@@ -1,13 +1,13 @@
 import Knex, { AlterTableBuilder, ColumnBuilder, Transaction } from "knex";
 import { SQLTypes } from "./SQLTypes.js";
-import { ResourceCatalog } from "../ResourceCatalog.js";
+import { EntityCatalog } from "../EntityCatalog.js";
 import { IColumn } from "../../schemaInterface/IColumn.js";
-import { ResourceSchema } from "./ResourceSchema.js";
+import { EntitySchema } from "./EntitySchema.js";
 import { DefaultSchema } from "../default/DefaultRow.js";
 
 export class ColumnSchema extends DefaultSchema<IColumn> {
 
-    protected resource!: ResourceSchema;
+    protected entity!: EntitySchema;
 
     constructor(data?: Partial<IColumn> & Required<Pick<IColumn, RequiredColumnParameters>>) {
         super({
@@ -37,21 +37,21 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
 
     }
 
-    public setResource(resource: ResourceSchema) {
-        this.resource = resource;
+    public setEntity(entity: EntitySchema) {
+        this.entity = entity;
     }
 
     public async install(connection?: Knex) {
 
-        if (this.resource == null) {
-            throw new Error("[ColumnSchema] This column was not associated with any Resource!");
+        if (this.entity == null) {
+            throw new Error("[ColumnSchema] This column was not associated with any Entity!");
         }
 
         if (connection != null)
             this.connection = connection;
 
         return this.connection.schema
-            .hasColumn(this.resource.get("table_name"), this.get("column_name"))
+            .hasColumn(this.entity.get("table_name"), this.get("column_name"))
             .then(async (columnExists) => {
                 console.log("[ColumnSchema] Will now install column: ", this.get("name"), " does it exist?", columnExists);
                 if (columnExists) {
@@ -66,11 +66,11 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
     public async save(transaction?: Transaction): Promise<boolean> {
 
 
-        this.set("resource_id", this.resource.get("_id"));
+        this.set("entity_id", this.entity.get("_id"));
 
         return this.connection
-            .table(ResourceCatalog.Column.table_name)
-            .where("resource_id", this.get("resource_id"))
+            .table(EntityCatalog.Column.table_name)
+            .where("entity_id", this.get("entity_id"))
             .where("name", this.get("name"))
             .where("column_name", this.get("column_name"))
             .select('*')
@@ -81,7 +81,7 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
 
                     return this.connection
                         .insert(data)
-                        .into(ResourceCatalog.Column.table_name)
+                        .into(EntityCatalog.Column.table_name)
                         .then((insertIds) => {
                             //this.set("_id", insertIds[0]);
                             this.setRowState("SYNCED");
@@ -91,9 +91,9 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
                     this.set("_id", res[0]._id);
                     delete data._id;
                     return this.connection
-                        .table(ResourceCatalog.Column.table_name)
+                        .table(EntityCatalog.Column.table_name)
                         .update(data)
-                        .where("resource_id", this.get("resource_id"))
+                        .where("entity_id", this.get("entity_id"))
                         .where("name", this.get("name"))
                         .where("column_name", this.get("column_name"))
                         .then((updated) => {
@@ -114,13 +114,13 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
     };
 
     protected async installAlterInTable() {
-        return this.connection.schema.alterTable(this.resource.get("table_name"), (builder) => {
+        return this.connection.schema.alterTable(this.entity.get("table_name"), (builder) => {
             return this.buildColumnWithBuilder(builder).alter();
         });
     }
 
     protected async installAddToTable() {
-        return this.connection.schema.alterTable(this.resource.get("table_name"), (builder) => {
+        return this.connection.schema.alterTable(this.entity.get("table_name"), (builder) => {
             let column = this.buildColumnWithBuilder(builder);
 
             //Can only define keys in ADD, when altering table it throws an error!

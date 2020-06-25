@@ -1,16 +1,16 @@
-import { ResourceSchema } from "./sql/ResourceSchema.js";
-import { ResourceCatalog } from "./ResourceCatalog.js";
+import { EntitySchema } from "./sql/EntitySchema.js";
+import { EntityCatalog } from "./EntityCatalog.js";
 import { ColumnSchema } from "./sql/ColumnSchema.js";
 
-export class User extends ResourceSchema {
+export class User extends EntitySchema {
  
     constructor() {
         super({
-            name : ResourceCatalog.User.name,
-            table_name : ResourceCatalog.User.table_name,
-            title : "@{Auria.Resource.User.Title}",
-            description : "@{Auria.Resource.User.Description}",
-            is_system_resource : true,
+            name : EntityCatalog.User.name,
+            table_name : EntityCatalog.User.table_name,
+            title : "@{Auria.Entity.User.Title}",
+            description : "@{Auria.Entity.User.Description}",
+            is_system_entity : true,
             status : "active"
         });
 
