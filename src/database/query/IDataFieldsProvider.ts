@@ -1,8 +1,8 @@
 import { QueryBuilder } from "knex";
-import { EntitySchema } from "../schema/sql/EntitySchema.js";
+import { EntityClass } from "../../entity/EntityClass.js";
 
 export interface IDataFieldsProvider {
 
-    selectFields(query: QueryBuilder, fields: string[] | "*", entity: EntitySchema): Promise<QueryBuilder>;
+    selectFields(query: QueryBuilder, entity: EntityClass, fields: string | string[]): Promise<QueryBuilder>;
     
 }

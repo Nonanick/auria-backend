@@ -1,6 +1,8 @@
 import { EntityClass } from "../../EntityClass";
 import { EntitySchema } from "../../../database/schema/sql/EntitySchema";
 import { ModulePageSchema } from "../../../database/schema/ModulePage";
+import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
+import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
 
 export class ModulePage extends EntityClass {
 
@@ -10,167 +12,220 @@ export class ModulePage extends EntityClass {
     public getBootFunction(): () => boolean | Promise<boolean> {
         return () => true;
     }
+    protected buildInfo(): IEntityInfo {
+        return {
+            title: "@{Auria.Entity.ModulePage.Title}",
+            description: "@{Auria.Entity.ModulePage.Description}",
+        };
+    }
     protected buildSchema(): EntitySchema {
         return new ModulePageSchema();
     }
 
     constructor() {
-        super();
+        super(EntityCatalog.ModulePage.name);
 
         this.addColumns(
             // _ID
             this.buildDefaultIdColumn(),
             // Module ID
             {
+                name: "Module ID",
+                info: {
+                    title: "@{Auria.Columns.ModulePage.ModuleID.Title}",
+                    description: "@{Auria.Columns.ModulePage.ModuleID.Description}",
+                },
                 schema: {
-                    name: "Module ID",
                     column_name: "module_id",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: false,
-                    title: "@{Auria.Columns.ModulePage.ModuleID.Title}",
-                    description: "@{Auria.Columns.ModulePage.ModuleID.Description}",
                     status: "active",
                     column_keys: ["IND"]
                 }
             },
             // Parent Menu ID
             {
+                name: "Parent Menu ID",
+                info: {
+                    title: "@{Auria.Columns.ModulePage.ParentMenuID.Title}",
+                    description: "@{Auria.Columns.ModulePage.ParentMenuID.Description}",
+                },
                 schema: {
-                    name: "Parent Menu ID",
                     column_name: "parent_menu_id",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: true,
-                    title: "@{Auria.Columns.ModulePage.ParentMenuID.Title}",
-                    description: "@{Auria.Columns.ModulePage.ParentMenuID.Description}",
                     status: "active",
                     column_keys: ["IND"]
                 }
             },
             // Name
             {
+                name: "Name",
+                info: {
+                    title: "@{Auria.Columns.ModulePage.Name.Title}",
+                    description: "@{Auria.Columns.ModulePage.Name.Description}",
+                },
                 schema: {
-                    name: "Name",
                     column_name: "name",
                     sql_type: "VARCHAR",
                     nullable: false,
-                    title: "@{Auria.Columns.ModulePage.Name.Title}",
-                    description: "@{Auria.Columns.ModulePage.Name.Description}",
                     status: "active",
                 }
             },
             // Title
             {
+                name: "Title",
+                info: {
+                    title: "@{Auria.Columns.ModulePage.Title.Title}",
+                    description: "@{Auria.Columns.ModulePage.Title.Description}",
+                },
                 schema: {
-                    name: "Title",
                     column_name: "title",
                     sql_type: "VARCHAR",
                     nullable: false,
-                    title: "@{Auria.Columns.ModulePage.Title.Title}",
-                    description: "@{Auria.Columns.ModulePage.Title.Description}",
                     status: "active",
                 }
             },
             // Description
             {
+                name: "Description",
+                info: {
+                    title: "@{Auria.Columns.ModulePage.Description.Title}",
+                    description: "@{Auria.Columns.ModulePage.Description.Description}",
+                },
                 schema: {
-                    name: "Description",
                     column_name: "description",
                     sql_type: "VARCHAR",
                     nullable: true,
-                    title: "@{Auria.Columns.ModulePage.Description.Title}",
-                    description: "@{Auria.Columns.ModulePage.Description.Description}",
                     status: "active",
                 }
             },
             // Engine
             {
+                name: "Engine",
+                info: {
+                    title: "@{Auria.Columns.ModulePage.Engine.Title}",
+                    description: "@{Auria.Columns.ModulePage.Engine.Description}",
+                },
                 schema: {
-                    name: "Engine",
                     column_name: "engine",
                     sql_type: "VARCHAR",
                     nullable: false,
-                    title: "@{Auria.Columns.ModulePage.Engine.Title}",
-                    description: "@{Auria.Columns.ModulePage.Engine.Description}",
                     status: "active",
                 }
             },
             // Icon
             {
+                name: "Icon",
+                info: {
+                    title: "@{Auria.Columns.ModulePage.Icon.Title}",
+                    description: "@{Auria.Columns.ModulePage.Icon.Description}",
+                },
                 schema: {
-                    name: "Icon",
                     column_name: "icon",
                     sql_type: "VARCHAR",
                     nullable: true,
-                    title: "@{Auria.Columns.ModulePage.Icon.Title}",
-                    description: "@{Auria.Columns.ModulePage.Icon.Description}",
                     status: "active",
                 }
             },
             // URL
             {
+                name: "URL",
+                info: {
+                    title: "@{Auria.Columns.ModulePage.URL.Title}",
+                    description: "@{Auria.Columns.ModulePage.URL.Description}",
+                },
                 schema: {
-                    name: "URL",
                     column_name: "url",
                     sql_type: "VARCHAR",
                     nullable: false,
-                    title: "@{Auria.Columns.ModulePage.URL.Title}",
-                    description: "@{Auria.Columns.ModulePage.URL.Description}",
                     status: "active",
                 }
             },
             // Data Requirements
             {
+                name: "Data Requirements",
+                info: {
+                    title: "@{Auria.Columns.ModulePage.DataRequirements.Title}",
+                    description: "@{Auria.Columns.ModulePage.DataRequirements.Description}",
+                },
                 schema: {
-                    name: "Data Requirements",
                     column_name: "data_requirements",
                     sql_type: "JSON",
                     nullable: true,
-                    title: "@{Auria.Columns.ModulePage.DataRequirements.Title}",
-                    description: "@{Auria.Columns.ModulePage.DataRequirements.Description}",
                     status: "active",
                 }
             },
             // Api Requirements
             {
+                name: "API Requirements",
+                info: {
+                    title: "@{Auria.Columns.ModulePage.APIRequirements.Title}",
+                    description: "@{Auria.Columns.ModulePage.APIRequirements.Description}",
+                },
                 schema: {
-                    name: "API Requirements",
                     column_name: "api_requirements",
                     sql_type: "JSON",
                     nullable: true,
-                    title: "@{Auria.Columns.ModulePage.APIRequirements.Title}",
-                    description: "@{Auria.Columns.ModulePage.APIRequirements.Description}",
                     status: "active",
                 }
             },
             // Bind Entity
             {
+                name: "Bind Entity",
+                info: {
+                    title: "@{Auria.Columns.ModulePage.BindEntity.Title}",
+                    description: "@{Auria.Columns.ModulePage.BindEntity.Description}",
+                },
                 schema: {
-                    name: "Bind Entity",
                     column_name: "bind_entity",
                     sql_type: "VARCHAR",
                     nullable: true,
-                    title: "@{Auria.Columns.ModulePage.BindEntity.Title}",
-                    description: "@{Auria.Columns.ModulePage.BindEntity.Description}",
                     status: "active",
                 }
             },
             // Bind Model
             {
+                name: "Bind Model",
+                info: {
+                    title: "@{Auria.Columns.ModulePage.BindModel.Title}",
+                    description: "@{Auria.Columns.ModulePage.BindModel.Description}",
+                },
                 schema: {
-                    name: "Bind Model",
                     column_name: "bind_model",
                     sql_type: "VARCHAR",
                     nullable: false,
-                    title: "@{Auria.Columns.ModulePage.BindModel.Title}",
-                    description: "@{Auria.Columns.ModulePage.BindModel.Description}",
                     status: "active",
                 }
             },
 
             // Status
             this.buildDefaultStatusColumn(),
+        );
+
+        this.addReferences(
+            // Module ID
+            {
+                name: "Page_Belong_To_Module",
+                column: "module_id",
+                references: {
+                    column: "_id",
+                    inEntity: EntityCatalog.Module.name,
+                    inTable: EntityCatalog.Module.table_name
+                }
+            },
+            // Parent Menu ID
+            {
+                name: "Page_Might_Have_Parent_Menu",
+                column: "parent_menu_id",
+                references: {
+                    column: "_id",
+                    inEntity: EntityCatalog.ModuleMenu.name,
+                    inTable: EntityCatalog.ModuleMenu.table_name
+                }
+            }
         );
     }
 

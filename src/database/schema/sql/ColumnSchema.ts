@@ -5,22 +5,18 @@ import { IColumn } from "../../schemaInterface/IColumn.js";
 import { EntitySchema } from "./EntitySchema.js";
 import { DefaultSchema } from "../default/DefaultRow.js";
 
-export class ColumnSchema extends DefaultSchema<IColumn> {
+export class ColumnSchema extends DefaultSchema<ColumnSchemaParameters> {
 
     protected entity!: EntitySchema;
 
-    constructor(data?: Partial<IColumn> & Required<Pick<IColumn, RequiredColumnParameters>>) {
+    constructor(data?: Partial<ColumnSchemaParameters> & Required<Pick<ColumnSchemaParameters, RequiredColumnParameters>>) {
         super({
             ...{
                 _id: undefined,
                 default_value: undefined,
-                description: undefined,
                 length: undefined,
-                title: "",
-                reference_id: undefined,
                 nullable: true,
                 column_keys: [],
-                data_type: "string",
                 status: "active",
                 readable: true,
                 required: !data?.nullable ?? false
@@ -66,12 +62,12 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
     public async save(transaction?: Transaction): Promise<boolean> {
 
 
-        this.set("entity_id", this.entity.get("_id"));
+        //this.set("entity_id", this.entity.get("_id"));
 
         return this.connection
             .table(EntityCatalog.Column.table_name)
-            .where("entity_id", this.get("entity_id"))
-            .where("name", this.get("name"))
+            //.where("entity_id", this.get("entity_id"))
+            //.where("name", this.get("name"))
             .where("column_name", this.get("column_name"))
             .select('*')
             .then(async (res) => {
@@ -93,8 +89,8 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
                     return this.connection
                         .table(EntityCatalog.Column.table_name)
                         .update(data)
-                        .where("entity_id", this.get("entity_id"))
-                        .where("name", this.get("name"))
+                       // .where("entity_id", this.get("entity_id"))
+                      //  .where("name", this.get("name"))
                         .where("column_name", this.get("column_name"))
                         .then((updated) => {
                             if (updated == 1) {
@@ -186,10 +182,23 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
                 column.defaultTo(this.get("default_value"));
         }
 
-        if (this.get('description') != null) column.comment(this.get('description'));
+        if (this.get('comment') != null) column.comment(this.get('comment'));
 
         return column;
     }
 }
 
-export type RequiredColumnParameters = "column_name" | "name" | "sql_type";
+export type RequiredColumnParameters = "column_name" | "sql_type";
+
+export interface ColumnSchemaParameters {
+    column_name: string;
+    sql_type: SQLTypes;
+    length: number;
+    data_type: string;
+    default_value: any;
+    nullable: boolean;
+    column_keys: ("UNI" | "IND" | "PRI")[];
+    readable? : boolean;
+    required? : boolean;
+    comment? : string;
+}

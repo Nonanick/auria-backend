@@ -127,7 +127,16 @@ export class BootSequence extends EventEmitter {
 
     protected bootItem(name: string, item: Bootable) {
 
-        let ans = item.getBootFunction()();
+        const dependencies = item.getBootDependencies();
+        const callWith : {[name : string] : any}= {};
+        
+        for(let dep of dependencies) {
+            if(this.__bootItens.has(dep)) {
+                callWith[dep] = this.__bootItens.get(dep)!;
+            }
+        }
+
+        let ans = item.getBootFunction(callWith)();
 
         if (ans instanceof Promise) {
             ans

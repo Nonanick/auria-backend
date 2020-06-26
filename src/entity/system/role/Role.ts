@@ -1,11 +1,12 @@
 import { EntityClass } from "../../EntityClass";
 import { EntitySchema } from "../../../database/schema/sql/EntitySchema";
+import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
 export class Role extends EntityClass {
 
     constructor() {
-        super();
-
+        super(EntityCatalog.Role.name);
 
         this.addColumns(
 
@@ -14,50 +15,58 @@ export class Role extends EntityClass {
 
             // Name
             {
+                name: "Name",
+                info: {
+                    title: "@{Auria.Columns.Role.Name.Title}",
+                    description: "@{Auria.Columns.Role.Name.Description}",
+                },
                 schema: {
-                    name: "Name",
                     column_name: "name",
                     sql_type: "VARCHAR",
                     nullable: false,
-                    title: "@{Auria.Columns.Role.Name.Title}",
-                    description: "@{Auria.Columns.Role.Name.Description}",
                     status: "active",
                     column_keys: ["IND"]
                 }
             },
             // Title
             {
+                name: "Title",
+                info: {
+                    title: "@{Auria.Columns.Role.Title.Title}",
+                    description: "@{Auria.Columns.Role.Title.Description}",
+                },
                 schema: {
-                    name: "Title",
                     column_name: "title",
                     sql_type: "VARCHAR",
                     nullable: false,
-                    title: "@{Auria.Columns.Role.Title.Title}",
-                    description: "@{Auria.Columns.Role.Title.Description}",
                     status: "active",
                 }
             },
             // Icon
             {
+                name: "Icon",
+                info: {
+                    title: "@{Auria.Columns.Role.Icon.Title}",
+                    description: "@{Auria.Columns.Role.Icon.Description}",
+                },
                 schema: {
-                    name: "Icon",
                     column_name: "icon",
                     sql_type: "VARCHAR",
                     nullable: true,
-                    title: "@{Auria.Columns.Role.Icon.Title}",
-                    description: "@{Auria.Columns.Role.Icon.Description}",
                     status: "active",
                 }
             },
             // Description
             {
+                name: "Description",
+                info: {
+                    title: "@{Auria.Columns.Role.Description.Title}",
+                    description: "@{Auria.Columns.Role.Description.Description}",
+                },
                 schema: {
-                    name: "Description",
                     column_name: "description",
                     sql_type: "VARCHAR",
                     nullable: false,
-                    title: "@{Auria.Columns.Role.Description.Title}",
-                    description: "@{Auria.Columns.Role.Description.Description}",
                     status: "active",
                 }
             },
@@ -67,14 +76,27 @@ export class Role extends EntityClass {
 
         );
     }
+
     public getBootDependencies(): string[] {
-        throw new Error("Method not implemented.");
+        return [];
     }
+
     public getBootFunction(): () => boolean | Promise<boolean> {
-        throw new Error("Method not implemented.");
+        return () => true;
     }
+
+    protected buildInfo(): IEntityInfo {
+        return {
+            title: "@{Auria.Entity.Role.Title}",
+            description: "@{Auria.Entity.Role.Description}"
+        };
+    }
+
     protected buildSchema(): EntitySchema {
-        throw new Error("Method not implemented.");
+        return new EntitySchema({
+            table_name: EntityCatalog.Role.table_name,
+            is_system_entity: true
+        });
     }
 
 }

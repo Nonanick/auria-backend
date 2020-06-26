@@ -1,25 +1,27 @@
 import Knex from "knex";
-import { Bootable } from "../boot/Bootable.js";
+import { nanoid } from "nanoid";
 import { EventEmitter } from "events";
+import { Bootable } from "../boot/Bootable.js";
 import { IDataFilterProvider } from "../database/query/IDataFilterProvider.js";
 import { ColumnClass, ColumnClassParameters } from "./ColumnClass.js";
 import { ColumnSchema } from "../database/schema/sql/ColumnSchema.js";
-import { nanoid } from "nanoid";
 import { ProcedureCatalog } from "./standart/procedures/ProcedureCatalog.js";
-import { ReferenceClass } from "./ReferenceClass.js";
+import { ReferenceClass, ReferenceClassParameters } from "./ReferenceClass.js";
 import { EntitySchema } from "../database/schema/sql/EntitySchema.js";
 import { IEntityAccessRule } from "./standart/accessRules/IEntityAccessRule.js";
 import { IEntityProcedure } from "./standart/procedures/IEntityProcedure.js";
 import { IEntityFacade } from "./standart/facade/IResourceFacade.js";
 import { IEntityInfo } from "./standart/info/IEntityInfo.js";
-import { IEntity } from "../database/schemaInterface/IEntity.js";
 import { ConnectionDefinition } from "../database/connection/ConnectionDefinition.js";
+import { ConnectionManager } from "../database/connection/ConnectionManager.js";
+import { DefaultSchemaData } from "../database/schemaInterface/default/DefaultSchemaData.js";
+import { AuriaRow } from "../database/schema/default/AuriaRow.js";
 
 export abstract class EntityClass extends EventEmitter implements Bootable {
 
     protected _connection!: Knex;
 
-    protected _connectionDefinition! : ConnectionDefinition;
+    protected _connectionDefinition?: ConnectionDefinition;
 
     protected _name!: string;
 
@@ -33,11 +35,16 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
         return this._schema;
     }
 
-    protected _info : IEntityInfo;
+    protected _info: IEntityInfo;
 
     protected _columns: {
         [name: string]: ColumnClass
     } = {};
+
+
+    public get columns() {
+        return { ...this._columns };
+    };
 
     protected _accessRules: {
         [name: string]: IEntityAccessRule
@@ -55,28 +62,31 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
         [name: string]: IEntityFacade
     } = {};
 
-    constructor() {
+    constructor(name: string) {
         super();
+
         this._schema = this.buildSchema();
         this._info = this.buildInfo();
+
+        this._name = name;
     }
 
     protected buildDefaultIdColumn(): ColumnClass {
         return new ColumnClass({
             name: "ID",
+            info: {
+                title: "@{Auria.Defaults.IdColumn.Title}",
+                description: "@{Auria.Defaults.IdColumn.Description}",
+            },
             schema: new ColumnSchema({
-                name: "ID",
                 column_name: "_id",
                 sql_type: "CHAR",
                 length: 22,
                 column_keys: ["PRI"],
                 data_type: "IDColumn",
-                title: "@{Auria.Defaults.IdColumn.Title}",
-                description: "@{Auria.Defaults.IdColumn.Description}",
                 nullable: false,
                 readable: true,
                 required: true,
-                status: "active"
             }),
             // Generate an nanoid everytime _id is requested and is null
             getProxies: (value) => {
@@ -97,17 +107,18 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
 
     protected buildDefaultStatusColumn(): ColumnClass {
         return new ColumnClass({
-            schema: new ColumnSchema({
-                name: "Status",
-                column_name: "status",
-                sql_type: "VARCHAR",
+            name: "Status",
+            info: {
                 title: "@{Auria.Defaults.StatusColumn.Title}",
                 description: "@{Auria.Defaults.StatusColumn.Description}",
+            },
+            schema: new ColumnSchema({
+                column_name: "status",
+                sql_type: "VARCHAR",
                 nullable: false,
                 default_value: "active",
                 readable: false,
                 required: true,
-                status: "active"
             }),
             validators: (value) => {
                 const validStatus = ["active", "inactive"];
@@ -127,26 +138,50 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
                     obj = column;
                 }
 
-                this._columns[obj.schema.get("name")] = obj;
+                this._columns[obj.name] = obj;
                 this._schema.addColumns(obj.schema);
             }
         }
     }
 
-    public addReferences(...references: ReferenceClass[]) {
+    public addProcedures(...procedures: IEntityProcedure[]) {
+        if (Array.isArray(procedures)) {
+            for (let procedure of procedures) {
+                this._procedures[procedure.name] = procedure;
+            }
+        }
+    }
+
+    public removeProcedure(name: string) {
+        if (this._procedures[name] != null) {
+            delete this._procedures[name];
+        } else {
+            console.warn("WARN! Entity ", this.name, " does not possess procedure ", name, " ignoring remove request!");
+        }
+    }
+
+    public hasProcedure(name: string) {
+        return this._procedures[name] != null;
+    }
+
+    public addReferences(...references: (ReferenceClass | ReferenceClassParameters)[]) {
 
         if (Array.isArray(references)) {
 
             for (let reference of references) {
-
-                this._references[reference.name] = reference;
-                this._schema.addReferences(reference.schema);
+                if (reference instanceof ReferenceClass) {
+                    this._references[reference.name] = reference;
+                    this._schema.addReferences(reference.schema);
+                } else {
+                    const refClass = new ReferenceClass(reference);
+                    this._references[reference.name] = refClass;
+                }
             }
         }
 
     }
 
-    public addAccessRule(...rules: IEntityAccessRule[]) {
+    public addAccessRules(...rules: IEntityAccessRule[]) {
         if (Array.isArray(rules)) {
             for (let rule of rules) {
                 this._accessRules[rule.name] = rule;
@@ -162,27 +197,32 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
         }
     }
 
-    public setConnection(connection : Knex | ConnectionDefinition) {
+    public setConnection(connection: Knex | ConnectionDefinition) {
 
-        if(connection instanceof Knex) {
+        if (connection instanceof Knex) {
             this._connection = connection as Knex;
             delete this._connectionDefinition;
         } else {
-            this._connection = ConnectionManager.fromDefinition(connection);
+            this._connection = ConnectionManager.fromDefinition(connection as ConnectionDefinition);
             this._connectionDefinition = connection as ConnectionDefinition;
         }
 
     }
 
-    public abstract getBootDependencies(): string[];
-    
+    public row<T extends DefaultSchemaData>() : AuriaRow<T> {
+        let row = new AuriaRow<T>(this);
+        return row;
+    }
+  
     public getBootableName(): string {
         return `BootOfEntity(${this.schema.get("name")})`;
     }
+
+    public abstract getBootDependencies(): string[];
 
     public abstract getBootFunction(): () => boolean | Promise<boolean>;
 
     protected abstract buildSchema(): EntitySchema;
 
-    protected abstract buildInfo() : IEntityInfo;
+    protected abstract buildInfo(): IEntityInfo;
 }

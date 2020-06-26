@@ -1,114 +1,184 @@
 import { EntityClass } from "../../EntityClass";
 import { EntitySchema } from "../../../database/schema/sql/EntitySchema";
-import { EntityHistorySchema } from "../../../database/schema/EntityActivity";
+import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
-export class EntityPrecedureHistory extends EntityClass {
+export class EntityProcedureHistory extends EntityClass {
 
     constructor() {
-        super();
+        super(EntityCatalog.EntityProcedureHistory.name);
 
         this.addColumns(
             // Entity ID
             {
+                name: "Entity ID",
+                info: {
+                    title: "@{Auria.Columns.EntityActivty.EntityID.Title}",
+                    description: "@{Auria.Column.EntityActivity.EntityID.Description}",
+                },
                 schema: {
-                    name: "Entity ID",
                     column_name: "entity_id",
                     sql_type: "CHAR",
                     length: 22,
-                    title: "@{Auria.Columns.EntityActivty.EntityID.Title}",
-                    description: "@{Auria.Column.EntityActivity.EntityID.Description}",
                     nullable: false,
                     status: "active"
                 }
             },
             // Entity Row ID
             {
+                name: "Entity Row ID",
+                info: {
+                    title: "@{Auria.Columns.EntityActivty.EntitySchemaID.Title}",
+                    description: "@{Auria.Column.EntityActivity.EntitySchemaID.Description}",
+                },
                 schema: {
-                    name: "Entity Row ID",
                     column_name: "entity_row_id",
                     sql_type: "CHAR",
                     length: 22,
-                    title: "@{Auria.Columns.EntityActivty.EntitySchemaID.Title}",
-                    description: "@{Auria.Column.EntityActivity.EntitySchemaID.Description}",
                     nullable: false,
                     status: "active"
                 }
             },
             // User ID
             {
+                name: "User ID",
+                info: {
+                    title: "@{Auria.Columns.EntityActivty.UserID.Title}",
+                    description: "@{Auria.Column.EntityActivity.UserID.Description}",
+                },
                 schema: {
-                    name: "User ID",
                     column_name: "user_id",
                     sql_type: "CHAR",
                     length: 22,
-                    title: "@{Auria.Columns.EntityActivty.UserID.Title}",
-                    description: "@{Auria.Column.EntityActivity.UserID.Description}",
                     nullable: false,
                     status: "active"
                 }
             },
             // Role ID
             {
+                name: "Role ID",
+                info: {
+                    title: "@{Auria.Columns.EntityActivty.UserID.Title}",
+                    description: "@{Auria.Column.EntityActivity.UserID.Description}",
+                },
                 schema: {
-                    name: "Role ID",
                     column_name: "role_id",
                     sql_type: "CHAR",
                     length: 22,
-                    title: "@{Auria.Columns.EntityActivty.UserID.Title}",
-                    description: "@{Auria.Column.EntityActivity.UserID.Description}",
                     nullable: false,
                     status: "active"
                 }
             },
             // User Authority
             {
+                name: "User Authority",
+                info: {
+                    title: "@{Auria.Column.EntityActivty.UserAuthority.Title}",
+                    description: "@{Auria.Column.EntityActivty.UserAuthority.Description}",
+                },
                 schema: {
-                    name: "User Authority",
                     column_name: "user_authority",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: true,
-                    title: "@{Auria.Column.EntityActivty.UserAuthority.Title}",
-                    description: "@{Auria.Column.EntityActivty.UserAuthority.Description}",
                     status: "active"
                 }
             },
             // Role Authority
             {
+                name: "Role Authority",
+                info: {
+                    title: "@{Auria.Column.EntityActivty.RoleAuthority.Title}",
+                    description: "@{Auria.Column.EntityActivty.RoleAuthority.Description}",
+                },
                 schema: {
-                    name: "Role Authority",
                     column_name: "role_authority",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: true,
-                    title: "@{Auria.Column.EntityActivty.RoleAuthority.Title}",
-                    description: "@{Auria.Column.EntityActivty.RoleAuthority.Description}",
                     status: "active"
                 }
             },
             // Data Procedure
             {
+                name: "Data Procedure",
+                info: {
+                    title: "@{Auria.Column.EntityAccessShare.DataProcedure.Title}",
+                    description: "@{Auria.Column.EntityAccessShare.DataProcedure.Description}",
+                },
                 schema: {
-                    name: "Data Procedure",
                     column_name: "data_procedure",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: false,
-                    title: "@{Auria.Column.EntityAccessShare.DataProcedure.Title}",
-                    description: "@{Auria.Column.EntityAccessShare.DataProcedure.Description}",
                     status: "active"
                 }
             },
             // Extra Information
             {
+                name: "Extra Information",
+                info: {
+                    title: "@{Auria.Column.EntityAccessShare.ExtraInformation.Title}",
+                    description: "@{Auria.Column.EntityAccessShare.ExtraInformation.Description}",
+                },
                 schema: {
-                    name: "Extra Information",
                     column_name: "extra_information",
                     sql_type: "JSON",
                     nullable: true,
-                    title: "@{Auria.Column.EntityAccessShare.ExtraInformation.Title}",
-                    description: "@{Auria.Column.EntityAccessShare.ExtraInformation.Description}",
                     status: "active"
+                }
+            },
+        );
+
+        this.addReferences(
+            // Entity ID
+            {
+                name: "Procedure_Made_In_Entity",
+                column: "entity_id",
+                references: {
+                    column: "_id",
+                    inEntity: EntityCatalog.Entity.name,
+                    inTable: EntityCatalog.Entity.table_name
+                }
+            },
+            // Role ID
+            {
+                name: "Procedure_Made_By_Role",
+                column: "role_id",
+                references: {
+                    column: "_id",
+                    inEntity: EntityCatalog.Role.name,
+                    inTable: EntityCatalog.Role.table_name
+                }
+            },
+            // User ID
+            {
+                name: "Procedure_Made_By_User",
+                column: "user_id",
+                references: {
+                    column: "_id",
+                    inEntity: EntityCatalog.User.name,
+                    inTable: EntityCatalog.User.table_name
+                }
+            },
+            // Role Authority
+            {
+                name: "Procedure_Made_With_Role_Authority",
+                column: "role_authority",
+                references: {
+                    column: "_id",
+                    inEntity: EntityCatalog.Role.name,
+                    inTable: EntityCatalog.Role.table_name
+                }
+            },
+            // User Authority
+            {
+                name: "Procedure_Made_With_User_Authority",
+                column: "user_authority",
+                references: {
+                    column: "_id",
+                    inEntity: EntityCatalog.User.name,
+                    inTable: EntityCatalog.User.table_name
                 }
             },
         );
@@ -121,8 +191,19 @@ export class EntityPrecedureHistory extends EntityClass {
     public getBootFunction(): () => boolean | Promise<boolean> {
         return () => true;
     }
+
+    protected buildInfo(): IEntityInfo {
+        return {
+            title: "@{Auria.Entity.EntityProcedureHistory.Title}",
+            description: "@{Auria.Entity.EntityProcedureHistory.Description}",
+        };
+    }
+
     protected buildSchema(): EntitySchema {
-        return new EntityHistorySchema();
+        return new EntitySchema({
+            table_name: EntityCatalog.EntityProcedureHistory.table_name,
+            is_system_entity: true
+        });
     }
 
 }

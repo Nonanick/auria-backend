@@ -1,11 +1,12 @@
 import { EntityClass } from "../../EntityClass";
 import { EntitySchema } from "../../../database/schema/sql/EntitySchema";
-import { PersistentLoginSchema } from "../../../database/schema/PersistentLogin.js";
+import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
 export class PersistentLogin extends EntityClass {
 
     constructor() {
-        super();
+        super(EntityCatalog.PersistentLogin.name);
 
         this.addColumns(
             // _ID
@@ -13,58 +14,78 @@ export class PersistentLogin extends EntityClass {
 
             // Username
             {
+                name: "Username",
+                info: {
+                    title: "@{Auria.Columns.Session.Username.Title}",
+                    description: "@{Auria.Columns.Session.Username.Description}",
+                },
                 schema: {
-                    name: "Username",
                     column_name: "username",
                     sql_type: "VARCHAR",
                     column_keys: ["IND"],
                     nullable: false,
-                    title: "@{Auria.Columns.Session.Username.Title}",
-                    description: "@{Auria.Columns.Session.Username.Description}",
                 }
             },
 
             // Token
             {
+                name: "Token",
+                info: {
+                    title: "@{Auria.Columns.Session.Token.Title}",
+                    description: "@{Auria.Columns.Session.Token.Description}",
+                },
                 schema: {
-                    name: "Token",
                     column_name: "token",
                     sql_type: "TEXT",
                     nullable: false,
-                    title: "@{Auria.Columns.Session.Token.Title}",
-                    description: "@{Auria.Columns.Session.Token.Description}",
                 }
             },
 
             // Referer Identification
             {
+                name: "Referer Identification",
+                info: {
+                    title: "@{Auria.Columns.Session.MachineIp.Title}",
+                    description: "@{Auria.Columns.Session.MachineIp.Description}",
+                },
                 schema: {
-                    name: "Referer Identification",
                     column_name: "referer_identification",
                     sql_type: "TEXT",
                     nullable: false,
-                    title: "@{Auria.Columns.Session.MachineIp.Title}",
-                    description: "@{Auria.Columns.Session.MachineIp.Description}",
-                    default_value: "IP_NOT_PROVIDED",
+                    default_value: "REFERER_NOT_IDENTIFIED",
                 }
             },
 
             // Login Time
             {
+                name: "Login Time",
+                info: {
+                    title: "@{Auria.Columns.Session.LoginTime.Title}",
+                    description: "@{Auria.Columns.Session.LoginTime.Description}",
+                },
                 schema: {
-                    name: "Login Time",
                     column_name: "login_time",
                     sql_type: "DATETIME",
                     nullable: false,
-                    title: "@{Auria.Columns.Session.LoginTime.Title}",
-                    description: "@{Auria.Columns.Session.LoginTime.Description}",
                 }
             },
 
             // Status
             this.buildDefaultStatusColumn()
-
         );
+
+        this.addReferences(
+            {
+                name: "Login_Associated_With_Username",
+                column: "username",
+                references: {
+                    inEntity: EntityCatalog.User.name,
+                    inTable: EntityCatalog.User.table_name,
+                    column: "username"
+                }
+            }
+        );
+        
     }
     public getBootDependencies(): string[] {
         return [];
@@ -74,8 +95,18 @@ export class PersistentLogin extends EntityClass {
         return () => true;
     }
 
+    protected buildInfo(): IEntityInfo {
+        return {
+            title: "@{Auria.Entity.PersistenLogin.Title}",
+            description: "@{Auria.Entity.PersistenLogin.Description}",
+        };
+    }
+
     protected buildSchema(): EntitySchema {
-        return new PersistentLoginSchema();
+        return new EntitySchema({
+            table_name: EntityCatalog.PersistentLogin.table_name,
+            is_system_entity: true
+        });
     }
 
 }

@@ -77,7 +77,7 @@ export class User extends EventEmitter implements Bootable {
 
     private _booted!: Promise<User>;
 
-    private _data : UserDataRepository;
+    private _data: UserDataRepository;
 
     public get privilege(): number {
         return this._privilege;
@@ -110,7 +110,8 @@ export class User extends EventEmitter implements Bootable {
             this._loadedPromise = system
                 .entityManager()
                 .getEntity(EntityCatalog.User.name)
-                .createRow<IUser>(username, "username")
+                .row<IUser>()
+                .byId(username, "username")
                 .then((userRow) => {
                     this.userRow = userRow;
                     this._privilege = userRow.get("user_privilege");
@@ -182,7 +183,8 @@ export class User extends EventEmitter implements Bootable {
             this.info = await this.system
                 .entityManager()
                 .getEntity(EntityCatalog.UserInfo.name)
-                .createRow<IUserInfo>(this.userRow.get("_id"), "user_id");
+                .row<IUserInfo>()
+                .byId(this.userRow.get("_id"), "user_id");
 
             this.rolesRepo = new UserRoleRepository(this.system, this);
             await this.rolesRepo.build();

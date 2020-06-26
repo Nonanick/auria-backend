@@ -16,6 +16,12 @@ export class ColumnClass extends EventEmitter implements Bootable {
         return this._name;
     }
 
+    protected _info: ColumnInfo;
+
+    public get info(): ColumnInfo {
+        return this._info;
+    }
+
     protected _schema!: ColumnSchema;
 
     public get schema() {
@@ -24,17 +30,37 @@ export class ColumnClass extends EventEmitter implements Bootable {
 
     protected _dataType!: IDataType;
 
+    public get dataType() {
+        return { ...this._dataType };
+    }
+
     protected _getProxies: IGetProxy[] = [];
 
+    public get getProxies() {
+        return [...this._getProxies];
+    }
+
     protected _setProxies: ISetProxy[] = [];
+
+    public get setProxies() {
+        return [...this._setProxies];
+    }
 
     protected _validators: {
         [procedure: string]: IDataValidator[]
     } = {};
 
+    public get validators() {
+        return { ...this._validators };
+    }
+
     protected _hooks: {
         [procedure: string]: IEntityProcedureHook[]
     } = {};
+
+    public get hooks() {
+        return { ...this._hooks };
+    }
 
     constructor(params: ColumnClassParameters) {
         super();
@@ -44,7 +70,13 @@ export class ColumnClass extends EventEmitter implements Bootable {
         else
             this._schema = new ColumnSchema(params.schema);
 
-        this._name = params.name ?? this._schema.get("name");
+        this._name = params.name;
+
+        this._info = {
+            name: params.name,
+            title: params.info?.title ?? "",
+            description: params.info?.description ?? ""
+        };
     }
 
     public getBootDependencies(): string[] {
@@ -62,7 +94,11 @@ export class ColumnClass extends EventEmitter implements Bootable {
 }
 
 export interface ColumnClassParameters {
-    name?: string;
+    name: string;
+    info?: {
+        title?: string;
+        description?: string;
+    };
     schema: ColumnSchema | Partial<IColumn> & Required<Pick<IColumn, RequiredColumnParameters>>;
     dataType?: IDataType;
     getProxies?: IGetProxy | IGetProxy[];
@@ -73,4 +109,10 @@ export interface ColumnClassParameters {
     };
 }
 
-type RequiredColumnParameters = "column_name" | "name" | "sql_type";
+export interface ColumnInfo {
+    name: string;
+    title?: string;
+    description?: string;
+}
+
+type RequiredColumnParameters = "column_name" | "sql_type";

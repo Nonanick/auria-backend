@@ -1,9 +1,12 @@
 import { EntityClass } from "../../EntityClass";
 import { EntitySchema } from "../../../database/schema/sql/EntitySchema";
+import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
-export class EntityAccessShare extends EntityClass {
+export class EntityRowAccessShare extends EntityClass {
+    
     constructor() {
-        super();
+        super(EntityCatalog.EntityRowAccessShare.name);
 
         this.addColumns(
             // _ID
@@ -11,93 +14,107 @@ export class EntityAccessShare extends EntityClass {
 
             // Entity ID
             {
+                name: "Entity ID",
+                info: {
+                    title: "@{Auria.Column.EntityAccessShare.EntityID.Title}",
+                    description: "@{Auria.Column.EntityAccessShare.EntityID.Description}",
+                },
                 schema: {
-                    name: "Entity ID",
                     column_name: "entity_id",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: false,
-                    title: "@{Auria.Column.EntityAccessShare.EntityID.Title}",
-                    description: "@{Auria.Column.EntityAccessShare.EntityID.Description}",
                     column_keys: ["IND"],
                     status: "active"
                 }
             },
             // Entity Row ID
             {
+                name: "Entity Row ID",
+                info: {
+                    title: "@{Auria.Column.EntityAccessShare.EntitySchemaID.Title}",
+                    description: "@{Auria.Column.EntityAccessShare.EntitySchemaID.Description}",
+                },
                 schema: {
-                    name: "Entity Row ID",
                     column_name: "entity_row_id",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: false,
-                    title: "@{Auria.Column.EntityAccessShare.EntitySchemaID.Title}",
-                    description: "@{Auria.Column.EntityAccessShare.EntitySchemaID.Description}",
                     column_keys: ["IND"],
                     status: "active"
                 }
             },
             // User Authority
             {
+                name: "User Authority",
+                info: {
+                    title: "@{Auria.Column.EntityAccessShare.UserAuthority.Title}",
+                    description: "@{Auria.Column.EntityAccessShare.UserAuthority.Description}",
+                },
                 schema: {
-                    name: "User Authority",
                     column_name: "user_authority",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: true,
-                    title: "@{Auria.Column.EntityAccessShare.UserAuthority.Title}",
-                    description: "@{Auria.Column.EntityAccessShare.UserAuthority.Description}",
                     status: "active"
                 }
             },
             // Role Authority
             {
+                name: "Role Authority",
+                info: {
+                    title: "@{Auria.Column.EntityAccessShare.RoleAuthority.Title}",
+                    description: "@{Auria.Column.EntityAccessShare.RoleAuthority.Description}",
+                },
                 schema: {
-                    name: "Role Authority",
                     column_name: "role_authority",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: true,
-                    title: "@{Auria.Column.EntityAccessShare.RoleAuthority.Title}",
-                    description: "@{Auria.Column.EntityAccessShare.RoleAuthority.Description}",
                     status: "active"
                 }
             },
             // Shared With User ID
             {
+                name: "Shared With User ID",
+                info: {
+                    title: "@{Auria.Column.EntityAccessShare.SharedWithUserID.Title}",
+                    description: "@{Auria.Column.EntityAccessShare.SharedWithUserID.Description}",
+                },
                 schema: {
-                    name: "Shared With User ID",
                     column_name: "shared_with_user_id",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: true,
-                    title: "@{Auria.Column.EntityAccessShare.SharedWithUserID.Title}",
-                    description: "@{Auria.Column.EntityAccessShare.SharedWithUserID.Description}",
                     status: "active"
                 }
             },
             // Shared With Role ID
             {
+                name: "Shared With Role ID",
+                info: {
+                    title: "@{Auria.Column.EntityAccessShare.SharedWithRoleID.Title}",
+                    description: "@{Auria.Column.EntityAccessShare.SharedWithRoleID.Description}",
+                },
                 schema: {
-                    name: "Shared With Role ID",
                     column_name: "shared_with_role_id",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: true,
-                    title: "@{Auria.Column.EntityAccessShare.SharedWithRoleID.Title}",
-                    description: "@{Auria.Column.EntityAccessShare.SharedWithRoleID.Description}",
                     status: "active"
                 }
             },
             // Data Procedure
             {
+                name: "Data Procedure",
+                info: {
+                    title: "@{Auria.Column.EntityAccessShare.DataProcedure.Title}",
+                    description: "@{Auria.Column.EntityAccessShare.DataProcedure.Description}",
+                },
                 schema: {
-                    name: "Data Procedure",
                     column_name: "data_procedure",
                     sql_type: "VARCHAR",
                     nullable: false,
-                    title: "@{Auria.Column.EntityAccessShare.DataProcedure.Title}",
-                    description: "@{Auria.Column.EntityAccessShare.DataProcedure.Description}",
                     status: "active"
                 }
             },
@@ -110,11 +127,23 @@ export class EntityAccessShare extends EntityClass {
     public getBootDependencies(): string[] {
         throw new Error("Method not implemented.");
     }
+
     public getBootFunction(): () => boolean | Promise<boolean> {
         throw new Error("Method not implemented.");
     }
+
+    protected buildInfo(): IEntityInfo {
+        return {
+            title: "@{Auria.Entity.EntityRowAccessShare.Title}",
+            description: "@{Auria.Entity.EntityRowAccessShare.Description}"
+        };
+    }
+
     protected buildSchema(): EntitySchema {
-        throw new Error("Method not implemented.");
+        return new EntitySchema({
+            table_name: EntityCatalog.EntityRowAccessShare.table_name,
+            is_system_entity: true
+        });
     }
 
 }

@@ -1,13 +1,13 @@
 import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
 import { EntityClass } from "../../EntityClass.js";
 import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
-import { ColumnEntitySchema } from "./schema/ColumnEntitySchema.js";
+import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
 export class ColumnEntityInstance extends EntityClass {
 
 
     constructor() {
-        super();
+        super(EntityCatalog.Column.name);
 
         this.addColumns(
             // _ID
@@ -15,179 +15,200 @@ export class ColumnEntityInstance extends EntityClass {
 
             // Entity ID
             {
+                name: "Entity Id",
+                info: {
+                    title: "@{Auria.Columns.Column.EntityId.Title}",
+                    description: "@{Auria.Column.Column.EntityId.Description}",
+                },
                 schema: {
-                    name: "Entity Id",
                     column_name: "entity_id",
                     sql_type: "CHAR",
                     length: 22,
                     column_keys: ["IND"],
-                    description: "Reference to Auria entity ID",
                     nullable: false,
                     status: 'active',
-                    title: "@{Auria.Columns.Column.EntityId.Title}"
                 }
             },
             // Name 
             {
+                name: "Name",
+                info: {
+                    title: "@{Auria.Columns.Column.Name.Title}",
+                    description: "@{Auria.Columns.Column.Name.Description}"
+                },
                 schema: {
-                    name: "Name",
                     column_name: "name",
                     sql_type: "VARCHAR",
                     nullable: false,
                     status: 'active',
-                    title: "@{Auria.Columns.Column.Name.Title}",
-                    description: "@{Auria.Columns.Column.Name.Description}"
                 }
             },
             // Column Name
             {
+                name: "Column Name",
+                info: {
+                    title: "@{Auria.Columns.Column.ColumnName.Title}",
+                    description: "@{Auria.Columns.Column.ColumnName.Description}"
+                },
                 schema: {
-                    name: "Column Name",
                     column_name: "column_name",
                     sql_type: "VARCHAR",
                     nullable: false,
                     status: 'active',
-                    title: "@{Auria.Columns.Column.ColumnName.Title}",
-                    description: "@{Auria.Columns.Column.ColumnName.Description}"
                 }
             },
             // Title 
             {
+                name: "Title",
+                info: {
+                    title: "@{Auria.Columns.Column.Title.Title}",
+                    description: "@{Auria.Columns.Column.Title.Description}"
+                },
                 schema: {
-                    name: "Title",
                     column_name: "title",
                     sql_type: "VARCHAR",
                     nullable: false,
                     status: 'active',
-                    title: "@{Auria.Columns.Column.Title.Title}",
-                    description: "@{Auria.Columns.Column.Title.Description}"
                 }
             },
             // Description 
             {
+                name: "Description",
+                info: {
+                    title: "@{Auria.Columns.Column.Description.Title}",
+                    description: "@{Auria.Columns.Column.Description.Description}"
+                },
                 schema: {
-                    name: "Description",
                     column_name: "description",
                     sql_type: "TEXT",
                     nullable: true,
                     status: 'active',
-                    title: "@{Auria.Columns.Column.Description.Title}",
-                    description: "@{Auria.Columns.Column.Description.Description}"
                 }
             },
             // SQL Type
             {
+                name: "SQL Type",
+                info: {
+                    title: "@{Auria.Columns.Column.SQLType.Title}",
+                    description: "@{Auria.Columns.Column.SQLType.Description}"
+                },
                 schema: {
-                    name: "SQL Type",
                     column_name: "sql_type",
                     sql_type: "VARCHAR",
                     nullable: false,
                     status: 'active',
-                    title: "@{Auria.Columns.Column.SQLType.Title}",
-                    description: "@{Auria.Columns.Column.SQLType.Description}"
                 }
             },
             // Length 
             {
+                name: "Length",
+                info: {
+                    title: "@{Auria.Columns.Column.Length.Title}",
+                    description: "@{Auria.Columns.Column.Length.Description}"
+                },
                 schema: {
-                    name: "Length",
                     column_name: "length",
                     sql_type: "INTEGER",
                     nullable: true,
                     status: 'active',
-                    title: "@{Auria.Columns.Column.Length.Title}",
-                    description: "@{Auria.Columns.Column.Length.Description}"
                 }
             },
             // Data Type
             {
+                name: "Data Type",
+                info: {
+                    title: "@{Auria.Columns.Column.DataType.Title}",
+                    description: "@{Auria.Columns.Column.DataType.Description}"
+                },
                 schema: {
-                    name: "Data Type",
                     column_name: "data_type",
                     sql_type: "VARCHAR",
                     nullable: false,
                     status: 'active',
-                    title: "@{Auria.Columns.Column.DataType.Title}",
-                    description: "@{Auria.Columns.Column.DataType.Description}"
                 }
             },
             // Default Value
             {
+                name: "Default Value",
+                info: {
+                    title: "@{Auria.Columns.Column.DefaultValue.Title}",
+                    description: "@{Auria.Columns.Column.DefaultValue.Description}"
+                },
                 schema: {
-                    name: "Default Value",
                     column_name: "default_value",
                     sql_type: "VARCHAR",
                     nullable: true,
                     status: 'active',
-                    title: "@{Auria.Columns.Column.DefaultValue.Title}",
-                    description: "@{Auria.Columns.Column.DefaultValue.Description}"
                 }
             },
             // Nullable
             {
+                name: "Nullable",
+                info: {
+                    title: "@{Auria.Columns.Column.Nullable.Title}",
+                    description: "@{Auria.Columns.Column.Nullable.Description}",
+                },
                 schema: {
-                    name: "Nullable",
                     column_name: "nullable",
                     sql_type: "BOOLEAN",
                     nullable: false,
                     status: 'active',
-                    title: "@{Auria.Columns.Column.Nullable.Title}",
-                    description: "@{Auria.Columns.Column.Nullable.Description}",
                     default_value: true
                 }
             },
             // Column Keys
             {
+                name: "Column Keys",
+                info: {
+                    title: "@{Auria.Columns.Column.ColumnKeys.Title}",
+                    description: "@{Auria.Columns.Column.ColumnKeys.Description}",
+                },
                 schema: {
-                    name: "Column Keys",
                     column_name: "column_keys",
                     sql_type: "VARCHAR",
                     nullable: true,
                     status: 'active',
-                    title: "@{Auria.Columns.Column.ColumnKeys.Title}",
-                    description: "@{Auria.Columns.Column.ColumnKeys.Description}",
                     default_value: ""
-                }
+                },
+                /*    hooks : {
+                        [ProcedureCatalog.CREATE] : (context) => context.procedureData['column_keys'].join(","),
+                        [ProcedureCatalog.UPDATE] : (v:string[]) => v.join(","),
+                        [ProcedureCatalog.READ_FETCH.name] : (v:string) => v.split(","),
+                    }*/
             },
             // Readable
             {
+                name: "Readable",
+                info: {
+                    title: "@{Auria.Columns.Column.Readable.Title}",
+                    description: "@{Auria.Columns.Column.Readable.Description}",
+                },
                 schema: {
-                    name: "Readable",
+
                     column_name: "readable",
                     sql_type: "BOOLEAN",
                     nullable: false,
                     status: 'active',
-                    title: "@{Auria.Columns.Column.Readable.Title}",
-                    description: "@{Auria.Columns.Column.Readable.Description}",
+
                     default_value: true
                 }
             },
             // Readable
             {
+                name: "Required",
+                info: {
+                    title: "@{Auria.Columns.Column.Readable.Title}",
+                    description: "@{Auria.Columns.Column.Readable.Description}",
+                },
                 schema: {
-                    name: "Required",
                     column_name: "required",
                     sql_type: "BOOLEAN",
                     nullable: false,
                     status: 'active',
-                    title: "@{Auria.Columns.Column.Readable.Title}",
-                    description: "@{Auria.Columns.Column.Readable.Description}",
                     default_value: false
                 }
             },
-            // Reference ID
-            {
-                schema: {
-                    name: "Reference ID",
-                    column_name: "reference_id",
-                    sql_type: "CHAR",
-                    length: 22,
-                    nullable: true,
-                    status: 'active',
-                    title: "@{Auria.Columns.Column.ReferenceId.Title}",
-                    description: "@{Auria.Columns.Column.ReferenceId.Description}",
-                }
-            },
+
             // Status
             this.buildDefaultStatusColumn(),
         );
@@ -200,8 +221,19 @@ export class ColumnEntityInstance extends EntityClass {
     public getBootFunction(): () => boolean | Promise<boolean> {
         return () => true;
     }
+
+    protected buildInfo(): IEntityInfo {
+        return {
+            title: "@{Auria.Entity.Column.Title}",
+            description: "@{Auria.Entity.Column.Description}",
+        };
+    }
+
     protected buildSchema(): EntitySchema {
-        return new ColumnEntitySchema();
+        return new EntitySchema({
+            table_name: EntityCatalog.Column.table_name,
+            is_system_entity: true
+        });
     }
 
 }

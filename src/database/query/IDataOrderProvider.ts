@@ -1,9 +1,9 @@
 import { QueryBuilder } from "knex";
-import { EntitySchema } from "../schema/sql/EntitySchema.js";
 import { IDataOrder } from 'auria-lib';
+import { EntityClass } from "../../entity/EntityClass.js";
 
 export interface IDataOrderProvider {
 
-    applyOrdering(query: QueryBuilder, ordering: string | IDataOrder | IDataOrder[], entity: EntitySchema): Promise<QueryBuilder>;
+    applyOrdering(query: QueryBuilder, entity: EntityClass, ordering: string | IDataOrder | IDataOrder[] ): Promise<QueryBuilder>;
 
 }

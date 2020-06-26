@@ -1,14 +1,17 @@
 import { EntityClass } from "../../EntityClass.js";
 import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
-import { EntityInstanceSchema } from "./schema/EntityInstanceSchema.js";
+import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
+import Knex from "knex";
 
 export class EntityInstance extends EntityClass {
 
-    constructor() {
-        super();
+    public get connection(): Knex {
+        return this._connection;
+    }
 
-        this._name = EntityCatalog.Entity.name;
+    constructor() {
+        super(EntityCatalog.Entity.name);
 
         this.addColumns(
             // ID
@@ -16,67 +19,89 @@ export class EntityInstance extends EntityClass {
 
             // Name
             {
+                name: "Name",
+                info: {
+                    title: "@{Auria.Column.Entity.Name.Title}",
+                    description: "@{Auria.Column.Entity.Name.Description}"
+                },
                 schema: {
-                    name: "Name",
                     column_name: "name",
                     sql_type: "VARCHAR",
                     nullable: false,
-                    title: "@{Auria.Column.Entity.Name.Title}",
-                    description: "@{Auria.Column.Entity.Name.Description}"
+                    column_keys: ["UNI"]
                 }
             },
 
             // Table Name
             {
+                name: "Table Name",
+                info: {
+                    title: "@{Auria.Column.Entity.TableName.Title}",
+                    description: "@{Auria.Column.Entity.TableName.Description}"
+                },
                 schema: {
-                    name: "Table Name",
                     column_name: "table_name",
                     sql_type: "VARCHAR",
                     nullable: false,
-                    title: "@{Auria.Column.Entity.TableName.Title}",
-                    description: "@{Auria.Column.Entity.TableName.Description}"
                 }
             },
 
             // Connection ID
             {
+                name: "Connection ID",
+                info: {
+                    title: "@{Auria.Column.Entity.ConnectionId.Title}",
+                    description: "@{Auria.Column.Entity.ConnectionId.Description}"
+                },
                 schema: {
-                    name: "Connection ID",
                     column_name: "connection_id",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: true,
-                    title: "@{Auria.Column.Entity.ConnectionId.Title}",
-                    description: "@{Auria.Column.Entity.ConnectionId.Description}"
                 }
             },
 
             // Title
             {
-                schema: {
-                    name: "Title",
-                    column_name: "title",
-                    sql_type: "VARCHAR",
-                    nullable: false,
+                name: "Title",
+                info: {
                     title: "@{Auria.Column.Entity.Title.Title}",
                     description: "@{Auria.Column.Entity.Title.Description}"
                 },
+                schema: {
+                    column_name: "title",
+                    sql_type: "VARCHAR",
+                    nullable: false,
+                },
             },
 
-            //Description 
+            // Description 
             {
+                name: "Description",
+                info: {
+                    title: "@{Auria.Column.Entity.Description.Title}",
+                    description: "@{Auria.Column.Entity.Description.Description}"
+                },
                 schema: {
-                    name: "Description",
                     column_name: "description",
                     sql_type: "TEXT",
                     nullable: true,
-                    title: "@{Auria.Column.Entity.Description.Title}",
-                    description: "@{Auria.Column.Entity.Description.Description}"
                 },
             },
 
             //Status
             this.buildDefaultStatusColumn()
+        );
+
+        this.addReferences(
+            {
+                name: 'Entity_Exists_In_Connection',
+                column: "connection_id",
+                references: {
+                    column: "_id",
+                    inEntity: EntityCatalog.Connection.name
+                }
+            }
         );
 
     }
@@ -90,7 +115,10 @@ export class EntityInstance extends EntityClass {
     }
 
     protected buildSchema() {
-        return new EntityInstanceSchema();
+        return new EntitySchema({
+            table_name: EntityCatalog.Entity.table_name,
+            is_system_entity: true
+        });
     }
 
     protected buildInfo(): IEntityInfo {

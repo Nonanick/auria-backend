@@ -1,6 +1,8 @@
 import { EventEmitter } from "events";
 import Knex, { Transaction, QueryBuilder } from "knex";
 import { RowInformationMissing } from "../exception/system/database/RowInformationMissing.js";
+import { ISetProxy } from "../entity/standart/setProxies/ISetProxy.js";
+import { IGetProxy } from "../entity/standart/getProxies/IGetProxy.js";
 
 export class Row<T = any> extends EventEmitter {
 
@@ -62,9 +64,15 @@ export class Row<T = any> extends EventEmitter {
      * chain use the previous value! Errors raised will NOT
      * stop the chain
      */
-    private getProxies: Map<keyof T, EntityGetProxy[]>;
+    private getProxies: Map<keyof T, IGetProxy[]>;
 
-    private setProxies: Map<keyof T, EntitySetProxy[]>;
+    /**
+     * SET Proxies
+     * ------------
+     * Captures the "set" value operation of a column/field
+     * Raising an error will prevent the value to be changed!
+     */
+    private setProxies: Map<keyof T, ISetProxy[]>;
 
     constructor(data?: Partial<T>) {
         super();
@@ -176,14 +184,14 @@ export class Row<T = any> extends EventEmitter {
         return this;
     }
 
-    public addGetProxy(propName: keyof T, getProxy: EntityGetProxy) {
+    public addGetProxy(propName: keyof T, getProxy: IGetProxy) {
         if (!this.getProxies.has(propName)) {
             this.getProxies.set(propName, []);
         }
         this.getProxies.get(propName)!.push(getProxy);
     }
 
-    public removeGetProxy(propName: keyof T, getProxy: EntityGetProxy) {
+    public removeGetProxy(propName: keyof T, getProxy: IGetProxy) {
         if (this.getProxies.has(propName)) {
             const proxies = this.getProxies.get(propName)!;
             const iOProxy = proxies.indexOf(getProxy);
@@ -198,14 +206,14 @@ export class Row<T = any> extends EventEmitter {
         return this;
     }
 
-    public addSetProxy(propName: keyof T, setProxy: EntitySetProxy) {
+    public addSetProxy(propName: keyof T, setProxy: ISetProxy) {
         if (!this.setProxies.has(propName)) {
             this.setProxies.set(propName, []);
         }
         this.setProxies.get(propName)!.push(setProxy);
     }
 
-    public removeSetProxy(propName: keyof T, setProxy: EntitySetProxy) {
+    public removeSetProxy(propName: keyof T, setProxy: ISetProxy) {
         if (this.setProxies.has(propName)) {
             const proxies = this.setProxies.get(propName)!;
             const iOProxy = proxies.indexOf(setProxy);
@@ -340,7 +348,7 @@ export class Row<T = any> extends EventEmitter {
     }
 
     public destroy() {
-        
+
         delete this.setProxies;
         delete this.getProxies;
         delete this.data;
@@ -354,8 +362,5 @@ export class Row<T = any> extends EventEmitter {
 }
 
 type RowSyncControlState = "NOT_ON_DATABASE" | "SYNCED" | "UNSYNCED";
-
-export type EntityGetProxy = (value: any) => Promise<any> | any;
-export type EntitySetProxy = (value: any, abort: EntityAbortSetOperation) => any | Promise<any>;
 
 export type EntityAbortSetOperation = (messageOrException: string | Error) => void;

@@ -6,7 +6,7 @@ import { IEntityReference } from "../../schemaInterface/IEntityReference.js";
 export class ReferenceSchema extends DefaultSchema<IEntityReference> {
 
 
-    constructor(data?: Omit<Required<IEntityReference>, "_id" | "status">) {
+    constructor(data?: Omit<IEntityReference, "_id" | "status">) {
         super(data);
         this.get("_id");
     }
@@ -16,7 +16,7 @@ export class ReferenceSchema extends DefaultSchema<IEntityReference> {
 
         if (this.connection == null)
             this.connection = connection;
-            
+
         // Update Entity ID (Might have changed if entity was synced with DB definition!)
         //this.set("entity_id", this.entity.get("_id"));
 

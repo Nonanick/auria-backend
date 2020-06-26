@@ -30,8 +30,8 @@ export class EntityManager extends EventEmitter implements Bootable {
             [EntityCatalog.ModulePage.name]: new SystemEntities.ModulePage(),
 
            // [EntityCatalog.EntityAccessPolicy.name]: new SystemEntities.EntityAccessPolicy(),
-            [EntityCatalog.EntityAccessShare.name]: new SystemEntities.EntityAccessShare(),
-            [EntityCatalog.EntityActivity.name]: new SystemEntities.EntityPrecedureHistory(),
+            [EntityCatalog.EntityRowAccessShare.name]: new SystemEntities.EntityAccessShare(),
+            [EntityCatalog.EntityProcedureHistory.name]: new SystemEntities.EntityPrecedureHistory(),
            // [EntityCatalog.EntityPagePermission.name]: new EntityPagePermission(),
             [EntityCatalog.Role.name]: new SystemEntities.Role(),
 

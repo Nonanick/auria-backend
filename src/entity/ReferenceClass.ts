@@ -14,19 +14,30 @@ export class ReferenceClass extends EventEmitter {
         return this._schema;
     }
 
-    constructor(params : ReferenceClassParameters) {
+    constructor(params: ReferenceClassParameters) {
         super();
-        this._schema = params.schema;
+        
+        this._name = params.name;
+
+        this._schema = new ReferenceSchema({
+            name: params.name,
+            column: params.column,
+            referenced_column: params.references.column,
+            referenced_entity: params.references.inEntity,
+            referenced_schema: params.references.inSchema,
+            referenced_table: params.references.inTable
+        });
+
     }
 }
 
 export interface ReferenceClassParameters {
-    schema : ReferenceSchema;
-}
-
-export interface IEntityReference {
-    name : string;
+    name: string;
     column: string;
-    referencedColumn : string;
-    referencedTable : string;
+    references: {
+        column: string;
+        inEntity?: string;
+        inTable?: string;
+        inSchema?: string;
+    };
 }

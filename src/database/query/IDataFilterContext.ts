@@ -1,10 +1,9 @@
 import { User } from "../../user/User.js";
-import { EntitySchema } from "../schema/sql/EntitySchema.js";
+import { EntityClass } from "../../entity/EntityClass.js";
 
 export interface IDataFilterContext {
     user : User;
     procedure : string;
-    entity : EntitySchema;
+    entity : EntityClass;
     roles : string[];
-    avaliableColumns : string[];
 }
