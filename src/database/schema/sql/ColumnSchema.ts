@@ -24,10 +24,10 @@ export class ColumnSchema extends DefaultSchema<ColumnSchemaParameters> {
             ...data
         });
 
-        this.defineGetter("column_keys", (keys) => {
+        this.replaceGetterFunction("column_keys", (keys) => {
             return String(keys).split(",");
         });
-        this.defineSetter("column_keys", (keys: string[]) => {
+        this.replaceSetterFunction("column_keys", (keys: string[]) => {
             return keys.join(",");
         })
 
@@ -49,7 +49,7 @@ export class ColumnSchema extends DefaultSchema<ColumnSchemaParameters> {
         return this.connection.schema
             .hasColumn(this.entity.get("table_name"), this.get("column_name"))
             .then(async (columnExists) => {
-                console.log("[ColumnSchema] Will now install column: ", this.get("name"), " does it exist?", columnExists);
+                console.log("[ColumnSchema] Will now install column: ", this.get("column_name"), " does it exist?", columnExists);
                 if (columnExists) {
                     await this.installAlterInTable();
                 } else {

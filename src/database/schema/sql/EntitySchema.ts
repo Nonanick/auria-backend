@@ -42,55 +42,6 @@ export class EntitySchema extends DefaultSchema<IEntity> {
             ...data
         });
 
-        const idColumn = new ColumnSchema({
-            name: "Id",
-            column_name: "_id",
-            column_keys: ["PRI"],
-            sql_type: "CHAR",
-            length: 22,
-            data_type: "nanoid",
-            nullable: false,
-        });
-
-        const statusColumn = new ColumnSchema({
-            name: "Status",
-            column_name: "status",
-            sql_type: "VARCHAR",
-            length: 20,
-            nullable: false,
-            default_value: "active",
-            title: "Entry Status",
-            description: "Row current state"
-        });
-
-        const createdAtColumn = new ColumnSchema({
-            name: "Created At",
-            column_name: "created_at",
-            sql_type: "TIMESTAMP",
-            default_value: "CURRENT_TIMESTAMP",
-            title: "Row Creation data",
-            description: "Row creation data"
-        });
-
-        this.addColumns(idColumn, statusColumn, createdAtColumn);
-
-    }
-
-    public async createRow<T extends DefaultSchemaData>(id?: string, col?: keyof T): Promise<AuriaRow<T>> {
-
-        let nRow = new AuriaRow<T>(this);
-        nRow.setConnection(this.connection);
-
-        if (id != null) {
-            await nRow.byId(id, col);
-        }
-
-        return nRow;
-
-    }
-
-    public async getRow<T extends DefaultSchemaData>(id: string, column?: keyof T): Promise<AuriaRow<T>> {
-        return this.createRow<T>(id, column);
     }
 
     public async save(transaction?: Transaction<any, unknown[]>): Promise<boolean> {
@@ -136,7 +87,7 @@ export class EntitySchema extends DefaultSchema<IEntity> {
 
     public addColumns(...columns: ColumnSchema[]) {
         columns.forEach((column) => {
-            const columnName = column.get("name");
+            const columnName = column.get("column_name");
             if (this.columns[columnName] != null)
                 throw new Error(`[EntitySchema] Duplicate column on entity! Column with name ${columnName} already exists in ${this.get("name")}`);
 
@@ -145,7 +96,7 @@ export class EntitySchema extends DefaultSchema<IEntity> {
 
             // Auto update Primary field!
             if (column.get("column_keys").includes("PRI")) {
-                this.setRowPrimaryField(column.get("column_name"));
+                this.setPrimaryFieldName(column.get("column_name"));
             }
 
             this.columns[columnName] = column;
@@ -185,15 +136,9 @@ export class EntitySchema extends DefaultSchema<IEntity> {
 
     public getColumnName(name: string): string | undefined {
         const allColumnNames = this.getColumns().map(c => c.get("column_name"));
-        const allNames = this.getColumns().map(c => c.get("name"));
 
         if (allColumnNames.includes(name)) {
             return name;
-        }
-
-        const ioName = allNames.indexOf(name);
-        if (ioName >= 0) {
-            return this.getColumns()[ioName].get("column_name");
         }
 
         return undefined;

@@ -3,6 +3,7 @@ import { DefaultSchemaData } from "../../schemaInterface/default/DefaultSchemaDa
 import { EntityClass } from "../../../entity/EntityClass.js";
 import { ColumnClass } from "../../../entity/ColumnClass.js";
 import { InvalidEntityProcedure } from "../../../exception/system/database/InvalidEntityProcedure.js";
+import { Transaction } from "knex";
 
 export class AuriaRow<T extends DefaultSchemaData> extends DefaultSchema<T> {
 
@@ -65,7 +66,7 @@ export class AuriaRow<T extends DefaultSchemaData> extends DefaultSchema<T> {
     }
 
     public async byId(id: string, column?: keyof T): Promise<AuriaRow<T>> {
-        const searchColumn = column ?? this.getRowPrimaryField();
+        const searchColumn = column ?? this.getPrimaryFieldName();
 
         return this.connection
             .select<T[]>('*')
@@ -83,4 +84,5 @@ export class AuriaRow<T extends DefaultSchemaData> extends DefaultSchema<T> {
                 return this;
             });
     }
+
 }

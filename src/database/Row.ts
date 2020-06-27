@@ -10,6 +10,11 @@ export class Row<T = any> extends EventEmitter {
 
     private rowControlState: RowSyncControlState = "NOT_ON_DATABASE";
 
+    /**
+     * Changed Attributes
+     * -------------------
+     * Hold all the changed attributes
+     */
     private changedAttributes: (keyof T)[] = [];
 
     private tableName!: string;
@@ -79,6 +84,7 @@ export class Row<T = any> extends EventEmitter {
 
         this.customGetters = new Map();
         this.customSetters = new Map();
+
         this.getProxies = new Map();
         this.setProxies = new Map();
 
@@ -99,12 +105,12 @@ export class Row<T = any> extends EventEmitter {
 
         target.set({ ...this.data, _id: undefined });
 
-        this.customGetters.forEach((getter, prop) => {
-            target.defineGetter(prop, getter);
+        this.customGetters.forEach((getter, fieldName) => {
+            target.replaceGetterFunction(fieldName, getter);
         });
 
-        this.customSetters.forEach((setter, prop) => {
-            target.defineSetter(prop, setter);
+        this.customSetters.forEach((setter, fieldName) => {
+            target.replaceSetterFunction(fieldName, setter);
         });
 
         return target;
@@ -115,11 +121,11 @@ export class Row<T = any> extends EventEmitter {
         return this;
     }
 
-    public setRowPrimaryField(field: keyof T) {
+    public setPrimaryFieldName(field: keyof T) {
         this.primaryKey = field;
     }
 
-    public getRowPrimaryField(): keyof T {
+    public getPrimaryFieldName(): keyof T {
         return this.primaryKey;
     }
 
@@ -174,12 +180,12 @@ export class Row<T = any> extends EventEmitter {
         return this;
     }
 
-    public defineSetter(propName: keyof T, setter: (value: any) => any): Row<T> {
+    public replaceSetterFunction(propName: keyof T, setter: (value: any) => any): Row<T> {
         this.customSetters.set(propName, setter);
         return this;
     }
 
-    public defineGetter(propName: keyof T, getter: (value: any) => any): Row<T> {
+    public replaceGetterFunction(propName: keyof T, getter: (value: any) => any): Row<T> {
         this.customGetters.set(propName, getter);
         return this;
     }
