@@ -87,6 +87,7 @@ export abstract class ResourceClass extends EventEmitter implements Bootable {
         });
     }
 
+
     protected buildDefaultStatusColumn(): ColumnClass {
         return new ColumnClass({
             schema: new ColumnSchema({
@@ -146,6 +147,22 @@ export abstract class ResourceClass extends EventEmitter implements Bootable {
         }
     }
 
+    public addProcedures(...procedures: IResourceProcedure[]) {
+        if (Array.isArray(procedures)) {
+            for (let procedure of procedures) {
+                this._procedures[procedure.name] = procedure;
+            }
+        }
+    }
+
+    public addFacades(...facades : IResourceFacade[]) {
+        if(Array.isArray(facades)) {
+            for(let facade of facades) {
+                this._facades[facade.name] = facade;
+            }
+        }
+    }
+
     public getFilterProviderForProcedure(procedure: string): IDataFilterProvider {
         return {
             applyFilter: async (query, context) => {
@@ -154,9 +171,8 @@ export abstract class ResourceClass extends EventEmitter implements Bootable {
         }
     }
 
-
     public abstract getBootDependencies(): string[];
-    
+
     public getBootableName(): string {
         return `BootOfResource(${this.schema.get("name")})`;
     }
