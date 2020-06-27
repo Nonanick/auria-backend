@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { System } from "../../../System.js";
-import { ResourceCatalog } from "../../../database/schema/ResourceCatalog.js";
+import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
 import { AuthenticationFailed } from "../../../exception/system/authentication/AuthenticationFailed.js";
 import { SessionCookieLogin } from '../sessionCookie/SessionCookieLogin.js';
 import { ILoginMethod, LoginReturn } from '../interfaces/IAuthenticationMethod.js';
@@ -53,7 +53,7 @@ export class CredentialsAuthentication implements ILoginMethod {
     private compareCredentials(system: System, username: string, password: string): Promise<string> {
         return system.getConnection()
             .select<IUser[]>("_id", "username", "password", "user_privilege")
-            .from(ResourceCatalog.User.table_name)
+            .from(EntityCatalog.User.table_name)
             .where("username", username)
             .then(async (results) => {
 

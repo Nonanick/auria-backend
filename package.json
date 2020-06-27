@@ -42,7 +42,7 @@
     "Backend"
   ],
   "_moduleAliases": {
-    "@system-resource": "./src/resource/system"
+    "@system-entity": "./src/entity/system"
   },
   "author": "Nicholas Frai",
   "license": "ISC"

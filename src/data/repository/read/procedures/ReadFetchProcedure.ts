@@ -1,6 +1,6 @@
 import { IReadProcedure } from "../IReadProcedure.js";
 import { IReadRequest, IReadResponse } from "auria-lib";
-import { ResourceSchema } from "../../../../database/schema/sql/ResourceSchema.js";
+import { EntitySchema } from "../../../../database/schema/sql/EntitySchema.js";
 import { User } from "../../../../user/User.js";
 import { DataReadResponse } from "../DataReadResponse.js";
 import { IDataFilterContext } from "../../../../database/query/IDataFilterContext.js";
@@ -12,12 +12,12 @@ import { KnexGroupByAdapter } from "../knex/KnexGroupByAdapter.js";
 
 export class ReadFetchProcedure implements IReadProcedure {
 
-    public async processRequest(request: IReadRequest<any>, resource: ResourceSchema, user: User): Promise<IReadResponse> {
+    public async processRequest(request: IReadRequest<any>, entity: EntitySchema, user: User): Promise<IReadResponse> {
 
-        const query = resource.getConnection()
-            .table(resource.get("table_name"));
+        const query = entity.getConnection()
+            .table(entity.get("table_name"));
 
-        KnexColumnAdapter.selectFields(query, request.pick! as any, resource);
+        KnexColumnAdapter.selectFields(query, request.pick! as any, entity);
 
         KnexLimitAdapter.applyLimit(query, {
             paginateResult: request.limit != "unlimited" && request.limit! > 0,
@@ -25,24 +25,24 @@ export class ReadFetchProcedure implements IReadProcedure {
             resultsPerPage: request.limit ?? 20
         });
 
-        KnexOrderAdapter.applyOrdering(query, request.order!, resource);
+        KnexOrderAdapter.applyOrdering(query, request.order!, entity);
 
-        KnexGroupByAdapter.groupBy(query, request.groupBy, resource);
+        KnexGroupByAdapter.groupBy(query, request.groupBy, entity);
         
         const filterContext: IDataFilterContext = {
-            avaliableColumns: resource.getColumns().map(c => c.get("column_name")),
+            avaliableColumns: entity.getColumns().map(c => c.get("column_name")),
             procedure: "READ",
             roles: await (await user.roles()).getRolesId(),
             user: user,
-            resource: resource
+            entity: entity
         };
 
         if (request.filters) {
             KnexFilterAdapter.applyFilter(query, request.filters!, filterContext);
         }
 
-        // Resource defined filters!
-        const filters = resource.getFilters();
+        // Entity defined filters!
+        const filters = entity.getFilters();
 
         filters.forEach((f) => {
             f.applyFilter(query, {}, filterContext);
@@ -61,9 +61,9 @@ export class ReadFetchProcedure implements IReadProcedure {
     }
 
 
-    protected getValidColumns(resource: ResourceSchema, columns: string[] | "*"): string[] {
+    protected getValidColumns(entity: EntitySchema, columns: string[] | "*"): string[] {
         // Only allow "readable" columns! (Should I just return them empty?)
-        const cols = resource.getColumns().filter(c => c.get("readable") !== false);
+        const cols = entity.getColumns().filter(c => c.get("readable") !== false);
 
         const allColumns = cols.map(c => c.get("column_name"));
         const allNames = cols.map(c => c.get("name"));

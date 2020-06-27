@@ -1,7 +1,7 @@
 import { User } from "../../../user/User.js";
 import { DataAccessPolicyFlag } from "./DataAccessPolicyFlag.js";
 import { IDataFilterProvider } from "../../../database/query/IDataFilterProvider.js";
-import { ProcedureCatalog } from "../../../resource/standart/procedures/ProcedureCatalog.js";
+import { ProcedureCatalog } from "../../../entity/standart/procedures/ProcedureCatalog.js";
 
 export interface IDataAccessPolicy extends IDataFilterProvider {
 
@@ -12,8 +12,8 @@ export interface IDataAccessPolicy extends IDataFilterProvider {
     flags? : DataAccessPolicyFlag[];
 }
 
-export interface IResourceAccessPolicyContext {
+export interface IEntityAccessPolicyContext {
     user : User;
-    resource : string;
+    entity : string;
     procedure : keyof typeof ProcedureCatalog;    
 }

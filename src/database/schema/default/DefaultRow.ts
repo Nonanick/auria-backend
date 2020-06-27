@@ -9,7 +9,7 @@ export class DefaultSchema<T = any> extends Row<T & DefaultSchemaData> {
         super(data);
 
         // By default generate a new nanoid each time _id is queried and is not defined!
-        this.defineGetter("_id", (value) => {
+        this.replaceGetterFunction("_id", (value) => {
             
             if (value == null) {
                 let nId = nanoid();
@@ -19,9 +19,9 @@ export class DefaultSchema<T = any> extends Row<T & DefaultSchemaData> {
             return value;
         });
 
-        this.setRowPrimaryField("_id");
+        this.setPrimaryFieldName("_id");
 
-        this.defineGetter("status", (value: RowStatus) => {
+        this.replaceGetterFunction("status", (value: RowStatus) => {
             if (value == null) {
                 return "active";
             }

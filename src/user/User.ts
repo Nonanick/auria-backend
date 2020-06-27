@@ -2,7 +2,7 @@ import { System } from "../System.js";
 import { AuriaRow } from "../database/schema/default/AuriaRow.js";
 import { UserAuthentication } from "./auth/UserAuthentication.js";
 import { Bootable } from "../boot/Bootable.js";
-import { ResourceCatalog } from "../database/schema/ResourceCatalog.js";
+import { EntityCatalog } from "../database/schema/EntityCatalog.js";
 import { IUserInfo } from "../database/schemaInterface/IUserInfo.js";
 import { EventEmitter } from "events";
 import { IUser } from "../database/schemaInterface/IUser.js";
@@ -77,7 +77,7 @@ export class User extends EventEmitter implements Bootable {
 
     private _booted!: Promise<User>;
 
-    private _data : UserDataRepository;
+    private _data: UserDataRepository;
 
     public get privilege(): number {
         return this._privilege;
@@ -108,9 +108,10 @@ export class User extends EventEmitter implements Bootable {
         if (this.username !== Guest_Username) {
 
             this._loadedPromise = system
-                .resourceManager()
-                .getResource(ResourceCatalog.User.name)
-                .createRow<IUser>(username, "username")
+                .entityManager()
+                .getEntity(EntityCatalog.User.name)
+                .row<IUser>()
+                .byId(username, "username")
                 .then((userRow) => {
                     this.userRow = userRow;
                     this._privilege = userRow.get("user_privilege");
@@ -180,9 +181,10 @@ export class User extends EventEmitter implements Bootable {
 
             // TODO boot user routine
             this.info = await this.system
-                .resourceManager()
-                .getResource(ResourceCatalog.UserInfo.name)
-                .createRow<IUserInfo>(this.userRow.get("_id"), "user_id");
+                .entityManager()
+                .getEntity(EntityCatalog.UserInfo.name)
+                .row<IUserInfo>()
+                .byId(this.userRow.get("_id"), "user_id");
 
             this.rolesRepo = new UserRoleRepository(this.system, this);
             await this.rolesRepo.build();

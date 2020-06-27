@@ -1,6 +1,6 @@
 import { User } from "../User.js";
 import { System } from "../../System.js";
-import { ResourceCatalog } from "../../database/schema/ResourceCatalog.js";
+import { EntityCatalog } from "../../database/schema/EntityCatalog.js";
 import { Row } from "../../database/Row.js";
 
 export class UserRoleRepository {
@@ -48,8 +48,8 @@ export class UserRoleRepository {
         return Promise.resolve()
             .then(async _ => {
                 const conn = this.system.getConnection();
-                const userRoleTable = ResourceCatalog.UserRole.table_name;
-                const roleTable = ResourceCatalog.Role.table_name;
+                const userRoleTable = EntityCatalog.UserRole.table_name;
+                const roleTable = EntityCatalog.Role.table_name;
                 return conn
                     .select<IUserRoleInformation[]>(
                         userRoleTable + "._id as hire_id",

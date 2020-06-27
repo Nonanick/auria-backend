@@ -3,7 +3,7 @@ import { DefaultSchemaData } from "./default/DefaultSchemaData.js";
 
 export interface IColumn extends DefaultSchemaData {
     _id: string;
-    resource_id: string;
+    entity_id: string;
     name: string;
     column_name: string;
     title: string;

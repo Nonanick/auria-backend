@@ -11,6 +11,6 @@ export interface IModulePage extends DefaultSchemaData {
     url: string;
     data_requirements: string;
     api_requirements: string;
-    bind_resource: string;
+    bind_entity: string;
     bind_model: string;
 }

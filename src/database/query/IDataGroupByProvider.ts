@@ -1,7 +1,8 @@
 import { QueryBuilder } from "knex";
-import { ResourceSchema } from "../schema/sql/ResourceSchema.js";
+import { EntityClass } from "../../entity/EntityClass.js";
 
 export interface IDataGroupByProvider {
 
-    groupBy(query: QueryBuilder, group: any, resource: ResourceSchema): Promise<QueryBuilder>;
+    groupBy(query: QueryBuilder,  entity: EntityClass, group: any): Promise<QueryBuilder>;
+    
 }

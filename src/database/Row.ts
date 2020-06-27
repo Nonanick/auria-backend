@@ -1,6 +1,8 @@
 import { EventEmitter } from "events";
 import Knex, { Transaction, QueryBuilder } from "knex";
 import { RowInformationMissing } from "../exception/system/database/RowInformationMissing.js";
+import { ISetProxy } from "../entity/standart/setProxies/ISetProxy.js";
+import { IGetProxy } from "../entity/standart/getProxies/IGetProxy.js";
 
 export class Row<T = any> extends EventEmitter {
 
@@ -8,6 +10,11 @@ export class Row<T = any> extends EventEmitter {
 
     private rowControlState: RowSyncControlState = "NOT_ON_DATABASE";
 
+    /**
+     * Changed Attributes
+     * -------------------
+     * Hold all the changed attributes
+     */
     private changedAttributes: (keyof T)[] = [];
 
     private tableName!: string;
@@ -62,15 +69,22 @@ export class Row<T = any> extends EventEmitter {
      * chain use the previous value! Errors raised will NOT
      * stop the chain
      */
-    private getProxies: Map<keyof T, ResourceGetProxy[]>;
+    private getProxies: Map<keyof T, IGetProxy[]>;
 
-    private setProxies: Map<keyof T, ResourceSetProxy[]>;
+    /**
+     * SET Proxies
+     * ------------
+     * Captures the "set" value operation of a column/field
+     * Raising an error will prevent the value to be changed!
+     */
+    private setProxies: Map<keyof T, ISetProxy[]>;
 
     constructor(data?: Partial<T>) {
         super();
 
         this.customGetters = new Map();
         this.customSetters = new Map();
+
         this.getProxies = new Map();
         this.setProxies = new Map();
 
@@ -91,12 +105,12 @@ export class Row<T = any> extends EventEmitter {
 
         target.set({ ...this.data, _id: undefined });
 
-        this.customGetters.forEach((getter, prop) => {
-            target.defineGetter(prop, getter);
+        this.customGetters.forEach((getter, fieldName) => {
+            target.replaceGetterFunction(fieldName, getter);
         });
 
-        this.customSetters.forEach((setter, prop) => {
-            target.defineSetter(prop, setter);
+        this.customSetters.forEach((setter, fieldName) => {
+            target.replaceSetterFunction(fieldName, setter);
         });
 
         return target;
@@ -107,11 +121,11 @@ export class Row<T = any> extends EventEmitter {
         return this;
     }
 
-    public setRowPrimaryField(field: keyof T) {
+    public setPrimaryFieldName(field: keyof T) {
         this.primaryKey = field;
     }
 
-    public getRowPrimaryField(): keyof T {
+    public getPrimaryFieldName(): keyof T {
         return this.primaryKey;
     }
 
@@ -166,24 +180,24 @@ export class Row<T = any> extends EventEmitter {
         return this;
     }
 
-    public defineSetter(propName: keyof T, setter: (value: any) => any): Row<T> {
+    public replaceSetterFunction(propName: keyof T, setter: (value: any) => any): Row<T> {
         this.customSetters.set(propName, setter);
         return this;
     }
 
-    public defineGetter(propName: keyof T, getter: (value: any) => any): Row<T> {
+    public replaceGetterFunction(propName: keyof T, getter: (value: any) => any): Row<T> {
         this.customGetters.set(propName, getter);
         return this;
     }
 
-    public addGetProxy(propName: keyof T, getProxy: ResourceGetProxy) {
+    public addGetProxy(propName: keyof T, getProxy: IGetProxy) {
         if (!this.getProxies.has(propName)) {
             this.getProxies.set(propName, []);
         }
         this.getProxies.get(propName)!.push(getProxy);
     }
 
-    public removeGetProxy(propName: keyof T, getProxy: ResourceGetProxy) {
+    public removeGetProxy(propName: keyof T, getProxy: IGetProxy) {
         if (this.getProxies.has(propName)) {
             const proxies = this.getProxies.get(propName)!;
             const iOProxy = proxies.indexOf(getProxy);
@@ -198,14 +212,14 @@ export class Row<T = any> extends EventEmitter {
         return this;
     }
 
-    public addSetProxy(propName: keyof T, setProxy: ResourceSetProxy) {
+    public addSetProxy(propName: keyof T, setProxy: ISetProxy) {
         if (!this.setProxies.has(propName)) {
             this.setProxies.set(propName, []);
         }
         this.setProxies.get(propName)!.push(setProxy);
     }
 
-    public removeSetProxy(propName: keyof T, setProxy: ResourceSetProxy) {
+    public removeSetProxy(propName: keyof T, setProxy: ISetProxy) {
         if (this.setProxies.has(propName)) {
             const proxies = this.setProxies.get(propName)!;
             const iOProxy = proxies.indexOf(setProxy);
@@ -340,7 +354,7 @@ export class Row<T = any> extends EventEmitter {
     }
 
     public destroy() {
-        
+
         delete this.setProxies;
         delete this.getProxies;
         delete this.data;
@@ -355,7 +369,4 @@ export class Row<T = any> extends EventEmitter {
 
 type RowSyncControlState = "NOT_ON_DATABASE" | "SYNCED" | "UNSYNCED";
 
-export type ResourceGetProxy = (value: any) => Promise<any> | any;
-export type ResourceSetProxy = (value: any, abort: ResourceAbortSetOperation) => any | Promise<any>;
-
-export type ResourceAbortSetOperation = (messageOrException: string | Error) => void;
+export type EntityAbortSetOperation = (messageOrException: string | Error) => void;

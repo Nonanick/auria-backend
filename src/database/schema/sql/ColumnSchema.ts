@@ -1,26 +1,22 @@
 import Knex, { AlterTableBuilder, ColumnBuilder, Transaction } from "knex";
 import { SQLTypes } from "./SQLTypes.js";
-import { ResourceCatalog } from "../ResourceCatalog.js";
+import { EntityCatalog } from "../EntityCatalog.js";
 import { IColumn } from "../../schemaInterface/IColumn.js";
-import { ResourceSchema } from "./ResourceSchema.js";
+import { EntitySchema } from "./EntitySchema.js";
 import { DefaultSchema } from "../default/DefaultRow.js";
 
-export class ColumnSchema extends DefaultSchema<IColumn> {
+export class ColumnSchema extends DefaultSchema<ColumnSchemaParameters> {
 
-    protected resource!: ResourceSchema;
+    protected entity!: EntitySchema;
 
-    constructor(data?: Partial<IColumn> & Required<Pick<IColumn, RequiredColumnParameters>>) {
+    constructor(data?: Partial<ColumnSchemaParameters> & Required<Pick<ColumnSchemaParameters, RequiredColumnParameters>>) {
         super({
             ...{
                 _id: undefined,
                 default_value: undefined,
-                description: undefined,
                 length: undefined,
-                title: "",
-                reference_id: undefined,
                 nullable: true,
                 column_keys: [],
-                data_type: "string",
                 status: "active",
                 readable: true,
                 required: !data?.nullable ?? false
@@ -28,32 +24,32 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
             ...data
         });
 
-        this.defineGetter("column_keys", (keys) => {
+        this.replaceGetterFunction("column_keys", (keys) => {
             return String(keys).split(",");
         });
-        this.defineSetter("column_keys", (keys: string[]) => {
+        this.replaceSetterFunction("column_keys", (keys: string[]) => {
             return keys.join(",");
         })
 
     }
 
-    public setResource(resource: ResourceSchema) {
-        this.resource = resource;
+    public setEntity(entity: EntitySchema) {
+        this.entity = entity;
     }
 
     public async install(connection?: Knex) {
 
-        if (this.resource == null) {
-            throw new Error("[ColumnSchema] This column was not associated with any Resource!");
+        if (this.entity == null) {
+            throw new Error("[ColumnSchema] This column was not associated with any Entity!");
         }
 
         if (connection != null)
             this.connection = connection;
 
         return this.connection.schema
-            .hasColumn(this.resource.get("table_name"), this.get("column_name"))
+            .hasColumn(this.entity.get("table_name"), this.get("column_name"))
             .then(async (columnExists) => {
-                console.log("[ColumnSchema] Will now install column: ", this.get("name"), " does it exist?", columnExists);
+                console.log("[ColumnSchema] Will now install column: ", this.get("column_name"), " does it exist?", columnExists);
                 if (columnExists) {
                     await this.installAlterInTable();
                 } else {
@@ -66,12 +62,12 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
     public async save(transaction?: Transaction): Promise<boolean> {
 
 
-        this.set("resource_id", this.resource.get("_id"));
+        //this.set("entity_id", this.entity.get("_id"));
 
         return this.connection
-            .table(ResourceCatalog.Column.table_name)
-            .where("resource_id", this.get("resource_id"))
-            .where("name", this.get("name"))
+            .table(EntityCatalog.Column.table_name)
+            //.where("entity_id", this.get("entity_id"))
+            //.where("name", this.get("name"))
             .where("column_name", this.get("column_name"))
             .select('*')
             .then(async (res) => {
@@ -81,7 +77,7 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
 
                     return this.connection
                         .insert(data)
-                        .into(ResourceCatalog.Column.table_name)
+                        .into(EntityCatalog.Column.table_name)
                         .then((insertIds) => {
                             //this.set("_id", insertIds[0]);
                             this.setRowState("SYNCED");
@@ -91,10 +87,10 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
                     this.set("_id", res[0]._id);
                     delete data._id;
                     return this.connection
-                        .table(ResourceCatalog.Column.table_name)
+                        .table(EntityCatalog.Column.table_name)
                         .update(data)
-                        .where("resource_id", this.get("resource_id"))
-                        .where("name", this.get("name"))
+                       // .where("entity_id", this.get("entity_id"))
+                      //  .where("name", this.get("name"))
                         .where("column_name", this.get("column_name"))
                         .then((updated) => {
                             if (updated == 1) {
@@ -114,13 +110,13 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
     };
 
     protected async installAlterInTable() {
-        return this.connection.schema.alterTable(this.resource.get("table_name"), (builder) => {
+        return this.connection.schema.alterTable(this.entity.get("table_name"), (builder) => {
             return this.buildColumnWithBuilder(builder).alter();
         });
     }
 
     protected async installAddToTable() {
-        return this.connection.schema.alterTable(this.resource.get("table_name"), (builder) => {
+        return this.connection.schema.alterTable(this.entity.get("table_name"), (builder) => {
             let column = this.buildColumnWithBuilder(builder);
 
             //Can only define keys in ADD, when altering table it throws an error!
@@ -186,10 +182,23 @@ export class ColumnSchema extends DefaultSchema<IColumn> {
                 column.defaultTo(this.get("default_value"));
         }
 
-        if (this.get('description') != null) column.comment(this.get('description'));
+        if (this.get('comment') != null) column.comment(this.get('comment'));
 
         return column;
     }
 }
 
-export type RequiredColumnParameters = "column_name" | "name" | "sql_type";
+export type RequiredColumnParameters = "column_name" | "sql_type";
+
+export interface ColumnSchemaParameters {
+    column_name: string;
+    sql_type: SQLTypes;
+    length: number;
+    data_type: string;
+    default_value: any;
+    nullable: boolean;
+    column_keys: ("UNI" | "IND" | "PRI")[];
+    readable? : boolean;
+    required? : boolean;
+    comment? : string;
+}
