@@ -1,12 +1,12 @@
-import { EntityClass } from "../../EntityClass";
-import { EntitySchema } from "../../../database/schema/sql/EntitySchema";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { EntityClass } from "../../EntityClass.js";
+import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
 export class PersistentLogin extends EntityClass {
 
     constructor() {
-        super(EntityCatalog.PersistentLogin.name);
+        super(SystemEntityCatalog.PersistentLogin.name);
 
         this.addColumns(
             // _ID
@@ -79,8 +79,8 @@ export class PersistentLogin extends EntityClass {
                 name: "Login_Associated_With_Username",
                 column: "username",
                 references: {
-                    inEntity: EntityCatalog.User.name,
-                    inTable: EntityCatalog.User.table_name,
+                    inEntity: SystemEntityCatalog.User.name,
+                    inTable: SystemEntityCatalog.User.table_name,
                     column: "username"
                 }
             }
@@ -104,7 +104,7 @@ export class PersistentLogin extends EntityClass {
 
     protected buildSchema(): EntitySchema {
         return new EntitySchema({
-            table_name: EntityCatalog.PersistentLogin.table_name,
+            table_name: SystemEntityCatalog.PersistentLogin.table_name,
             is_system_entity: true
         });
     }

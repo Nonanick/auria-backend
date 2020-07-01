@@ -1,31 +1,24 @@
 import { System } from "../../System.js";
 import { User } from "../../user/User.js";
-import { IReadRequest, IReadResponse } from "auria-lib";
-import { ReadFetchProcedure } from "./read/procedures/ReadFetchProcedure.js";
+import { IReadRequest } from "auria-lib";
+import { EntityProcedureCatalog } from "../../entity/standart/procedures/entity/EntityProcedureCatalog.js";
 
 export class DataRepository {
 
-    public static ReadProcedures = {
-        "FETCH": new ReadFetchProcedure(),
-        "COUNT": new ReadFetchProcedure(),
-        "PERMISSION": new ReadFetchProcedure()
-    };
-
     constructor(private system: System) { }
 
-    public async read(user: User, request: IReadRequest): Promise<IReadResponse> {
-        const enitty = this.system.entityManager().getEntity(request.from);
+    public async read(user: User, request: IReadRequest) //: Promise<IReadResponse> 
+    {
+        const entity = this.system.entityManager().getEntity(request.from);
 
-        let procedure = "FETCH"; // Default procedure
+        let procedure: keyof typeof EntityProcedureCatalog = "READ_FETCH"; // Default procedure
 
         if (request.procedure) {
-            if (Array.from(Object.keys(DataRepository.ReadProcedures)).includes(request.procedure)) {
-                procedure = request.procedure;
+            if (Array.from(Object.keys(EntityProcedureCatalog)).includes(request.procedure)) {
+                procedure = request.procedure as keyof typeof EntityProcedureCatalog;
             }
         }
 
-        return DataRepository.ReadProcedures
-        [procedure as keyof typeof DataRepository.ReadProcedures]
-            .processRequest(request, enitty, user);
+        EntityProcedureCatalog[procedure as keyof typeof EntityProcedureCatalog].run({ user, entity, using: request });
     }
 }

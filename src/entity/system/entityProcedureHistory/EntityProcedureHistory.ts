@@ -1,12 +1,12 @@
-import { EntityClass } from "../../EntityClass";
-import { EntitySchema } from "../../../database/schema/sql/EntitySchema";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { EntityClass } from "../../EntityClass.js";
+import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
 export class EntityProcedureHistory extends EntityClass {
 
     constructor() {
-        super(EntityCatalog.EntityProcedureHistory.name);
+        super(SystemEntityCatalog.EntityProcedureHistory.name);
 
         this.addColumns(
             // Entity ID
@@ -17,7 +17,7 @@ export class EntityProcedureHistory extends EntityClass {
                     description: "@{Auria.Column.EntityActivity.EntityID.Description}",
                 },
                 schema: {
-                    column_name: "entity_id",
+                    column_name: "entity_name",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: false,
@@ -134,11 +134,11 @@ export class EntityProcedureHistory extends EntityClass {
             // Entity ID
             {
                 name: "Procedure_Made_In_Entity",
-                column: "entity_id",
+                column: "entity_name",
                 references: {
-                    column: "_id",
-                    inEntity: EntityCatalog.Entity.name,
-                    inTable: EntityCatalog.Entity.table_name
+                    column: "name",
+                    inEntity: SystemEntityCatalog.Entity.name,
+                    inTable: SystemEntityCatalog.Entity.table_name
                 }
             },
             // Role ID
@@ -147,8 +147,8 @@ export class EntityProcedureHistory extends EntityClass {
                 column: "role_id",
                 references: {
                     column: "_id",
-                    inEntity: EntityCatalog.Role.name,
-                    inTable: EntityCatalog.Role.table_name
+                    inEntity: SystemEntityCatalog.Role.name,
+                    inTable: SystemEntityCatalog.Role.table_name
                 }
             },
             // User ID
@@ -157,8 +157,8 @@ export class EntityProcedureHistory extends EntityClass {
                 column: "user_id",
                 references: {
                     column: "_id",
-                    inEntity: EntityCatalog.User.name,
-                    inTable: EntityCatalog.User.table_name
+                    inEntity: SystemEntityCatalog.User.name,
+                    inTable: SystemEntityCatalog.User.table_name
                 }
             },
             // Role Authority
@@ -167,8 +167,8 @@ export class EntityProcedureHistory extends EntityClass {
                 column: "role_authority",
                 references: {
                     column: "_id",
-                    inEntity: EntityCatalog.Role.name,
-                    inTable: EntityCatalog.Role.table_name
+                    inEntity: SystemEntityCatalog.Role.name,
+                    inTable: SystemEntityCatalog.Role.table_name
                 }
             },
             // User Authority
@@ -177,8 +177,8 @@ export class EntityProcedureHistory extends EntityClass {
                 column: "user_authority",
                 references: {
                     column: "_id",
-                    inEntity: EntityCatalog.User.name,
-                    inTable: EntityCatalog.User.table_name
+                    inEntity: SystemEntityCatalog.User.name,
+                    inTable: SystemEntityCatalog.User.table_name
                 }
             },
         );
@@ -201,7 +201,7 @@ export class EntityProcedureHistory extends EntityClass {
 
     protected buildSchema(): EntitySchema {
         return new EntitySchema({
-            table_name: EntityCatalog.EntityProcedureHistory.table_name,
+            table_name: SystemEntityCatalog.EntityProcedureHistory.table_name,
             is_system_entity: true
         });
     }

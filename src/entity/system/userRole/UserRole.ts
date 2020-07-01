@@ -1,12 +1,12 @@
-import { EntityClass } from "../../EntityClass";
-import { EntitySchema } from "../../../database/schema/sql/EntitySchema";
+import { EntityClass } from "../../EntityClass.js";
+import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 
 export class UserRole extends EntityClass {
     
     constructor() {
-        super(EntityCatalog.UserRole.name);
+        super(SystemEntityCatalog.UserRole.name);
 
         this.addColumns(
             // _ID
@@ -89,7 +89,7 @@ export class UserRole extends EntityClass {
 
     protected buildSchema(): EntitySchema {
         return new EntitySchema({
-            table_name: EntityCatalog.UserRole.table_name,
+            table_name: SystemEntityCatalog.UserRole.table_name,
             is_system_entity: true
         });
     }

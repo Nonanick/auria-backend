@@ -1,13 +1,13 @@
 import { EntityClass } from "../../EntityClass.js";
 import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
 export class ModuleMenu extends EntityClass {
 
 
     constructor() {
-        super(EntityCatalog.ModuleMenu.name);
+        super(SystemEntityCatalog.ModuleMenu.name);
 
         this.addColumns(
             // _ID
@@ -141,8 +141,8 @@ export class ModuleMenu extends EntityClass {
                 column : "module_id",
                 references : {
                     column :"_id",
-                    inEntity : EntityCatalog.Module.name,
-                    inTable : EntityCatalog.Module.table_name,
+                    inEntity : SystemEntityCatalog.Module.name,
+                    inTable : SystemEntityCatalog.Module.table_name,
                 }
             },
             // Parent Menu ID
@@ -151,8 +151,8 @@ export class ModuleMenu extends EntityClass {
                 column : "parent_menu_id",
                 references : {
                     column :"_id",
-                    inEntity : EntityCatalog.ModuleMenu.name,
-                    inTable : EntityCatalog.ModuleMenu.table_name,
+                    inEntity : SystemEntityCatalog.ModuleMenu.name,
+                    inTable : SystemEntityCatalog.ModuleMenu.table_name,
                 }
             }
         );
@@ -174,7 +174,7 @@ export class ModuleMenu extends EntityClass {
 
     protected buildSchema(): EntitySchema {
         return new EntitySchema({
-            table_name: EntityCatalog.ModuleMenu.table_name,
+            table_name: SystemEntityCatalog.ModuleMenu.table_name,
             is_system_entity: true,
         });
     }

@@ -17,7 +17,8 @@ export class UserDataRepository {
         this._data = system.data();
     }
 
-    public async read(request : IReadRequest) : Promise<IReadResponse> {
+    public async read(request : IReadRequest)// : Promise<IReadResponse> 
+    {
         return this._data.read(this.user, request);
     }
 }

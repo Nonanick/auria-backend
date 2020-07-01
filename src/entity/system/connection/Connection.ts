@@ -1,13 +1,13 @@
 import { EntityClass } from "../../EntityClass.js";
 import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
 export class Connection extends EntityClass {
 
 
     constructor() {
-        super(EntityCatalog.Connection.name);
+        super(SystemEntityCatalog.Connection.name);
 
         this.addColumns(
             // _ID
@@ -130,7 +130,7 @@ export class Connection extends EntityClass {
 
     protected buildSchema(): EntitySchema {
         return new EntitySchema({
-            table_name: EntityCatalog.Connection.table_name,
+            table_name: SystemEntityCatalog.Connection.table_name,
             is_system_entity: true
         });
     }

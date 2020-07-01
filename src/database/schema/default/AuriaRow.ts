@@ -1,13 +1,23 @@
-import { DefaultSchema } from "./DefaultRow.js";
 import { DefaultSchemaData } from "../../schemaInterface/default/DefaultSchemaData.js";
 import { EntityClass } from "../../../entity/EntityClass.js";
 import { ColumnClass } from "../../../entity/ColumnClass.js";
 import { InvalidEntityProcedure } from "../../../exception/system/database/InvalidEntityProcedure.js";
-import { Transaction } from "knex";
+import { Row } from "../../Row.js";
+import { User } from "../../../user/User.js";
+import { ProcedureAuthority } from "../../../entity/standart/procedures/ProcedureAuthority.js";
+import { IEntityProcedureHook } from "../../../entity/standart/procedures/IEntityProcedureHook.js";
+import { ProcedureHookContext } from "../../../entity/standart/procedures/ProcedureHookContext.js";
+import Knex from "knex";
 
-export class AuriaRow<T extends DefaultSchemaData> extends DefaultSchema<T> {
+export class AuriaRow<T extends DefaultSchemaData> extends Row<T> {
 
+    protected systemConnection! : Knex;
+    
     private entity: EntityClass;
+
+    protected procedureHooks: {
+        [procedure: string]: IEntityProcedureHook[]
+    } = {};
 
     constructor(entity: EntityClass, data?: Partial<T>) {
         super(data);
@@ -18,13 +28,17 @@ export class AuriaRow<T extends DefaultSchemaData> extends DefaultSchema<T> {
         this.applyEntityRules(entity);
     }
 
-    public runProcedure(procedure: string) {
-        if (this.entity.hasProcedure(procedure)) {
-
+    public runProcedure<T extends DefaultSchemaData = any>(user: User, procedure: string, authority?: ProcedureAuthority) {
+        if (this.entity.hasRowProcedure(procedure)) {
+            this.checkUserPermission(user, procedure);
         } else {
             console.error("[AuriaRow] Entity does not possess procedure!");
             throw new InvalidEntityProcedure(`Entity '${this.entity.name}' does not accept procedure ${procedure}`);
         }
+    }
+
+    public setSystemConnection(connection : Knex) {
+        this.systemConnection = connection;
     }
 
     private applyEntityRules(entity: EntityClass) {
@@ -44,12 +58,15 @@ export class AuriaRow<T extends DefaultSchemaData> extends DefaultSchema<T> {
     private applyValidatorsFromColumn(column: ColumnClass) {
         for (let procedure in column.validators) {
             const validations = column.validators[procedure];
-            /*
-            this.addSetProxy(column.schema.get("column_name"), (value) => {
-                for(let validation of validations) { 
-                    let valid = validation(value);
+
+            if (this.procedureHooks[procedure] == null)
+                this.procedureHooks[procedure] = [];
+
+            this.procedureHooks[procedure].push(
+                async (context: ProcedureHookContext) => {
+                    // TODO apply validation!
                 }
-            });*/
+            );
         }
     }
 
@@ -78,11 +95,15 @@ export class AuriaRow<T extends DefaultSchemaData> extends DefaultSchema<T> {
                     this.setRowState("SYNCED");
                 }
                 else {
-                    console.error("[AuriaRow] Failed to pinpoint row with id ", id, ' in Table ', this.entity.schema.get("table_name"), ' searched in column', column);
+                    console.error("[AuriaRow] Failed to pinpoint row with id ", id, ' in Table ', this.entity.schema.get("table_name"), ' searched in column ', column);
                 }
 
                 return this;
             });
+    }
+
+    public checkUserPermission(user: User, procedure: string, authority?: ProcedureAuthority) {
+        this.systemConnection;
     }
 
 }

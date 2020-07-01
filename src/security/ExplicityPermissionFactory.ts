@@ -3,7 +3,7 @@ import { System } from "../System.js";
 import { ApiAccessRule } from "./apiAccess/AccessRule.js";
 import { ApiAccessRuleContext } from "./apiAccess/ApiAccessRuleContext.js";
 import { IApiAccess } from "../database/schemaInterface/IApiAccess.js";
-import { EntityCatalog } from "../database/schema/EntityCatalog.js";
+import { SystemEntityCatalog } from "../database/schema/SystemEntityCatalog.js";
 import { User, Guest_Username } from "../user/User.js";
 
 export class ExplicitPermissionFactory implements IExplicitPermissionFactory {
@@ -27,7 +27,7 @@ export class ExplicitPermissionFactory implements IExplicitPermissionFactory {
             
             let checkApiAccess = this.system.getConnection()
                 .select<IApiAccess[]>("_id")
-                .from(EntityCatalog.ApiAccess.table_name)
+                .from(SystemEntityCatalog.ApiAccess.table_name)
                 .where("user_id", await context.user.getId())
                 //.orWhereIn("role_id", await this.getAccessibleRolesIdFromUser(context.user))
                 .then((permissions) => {

@@ -1,8 +1,8 @@
 import { IDataAccessPolicy } from "../IDataAccessPolicy.js";
 import { QueryBuilder } from "knex";
 import { IDataFilterContext } from "../../../../database/query/IDataFilterContext.js";
-import { EntityCatalog } from "../../../../database/schema/EntityCatalog.js";
-import { IEntityActivity } from "../../../../database/schemaInterface/IEntityActivity.js";
+import { IEntityProcedureHistory } from "../../../../database/schemaInterface/IEntityActivity.js";
+import { SystemEntityCatalog } from "../../../../database/schema/SystemEntityCatalog.js";
 
 export class RoleBasedDataAccessPolicy implements IDataAccessPolicy {
 
@@ -38,11 +38,11 @@ export class RoleBasedDataAccessPolicy implements IDataAccessPolicy {
         switch (context.procedure) {
             default:
                 query.whereIn(
-                    context.entity.getRowPrimaryField(),
+                    context.entity.getPrimaryColumn()?.schema.get("column_name"),
                     function () {
-                        this.table(EntityCatalog.EntityActivity.table_name)
-                            .select<IEntityActivity>("entity_row_id")
-                            .where("entity_id", context.entity.get("_id"))
+                        this.table(SystemEntityCatalog.EntityProcedureHistory.table_name)
+                            .select<IEntityProcedureHistory>("entity_row_id")
+                            .where("entity_name", context.entity.auriaRow.get("name"))
                             .whereIn("role_id", roles)
                             .orWhereIn("role_authority", roles)
                     }

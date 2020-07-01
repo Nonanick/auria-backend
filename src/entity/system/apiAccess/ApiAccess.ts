@@ -1,12 +1,12 @@
 import { EntityClass } from "../../EntityClass.js";
 import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 
 export class ApiAccess extends EntityClass {
 
     constructor() {
-        super(EntityCatalog.ApiAccess.name);
+        super(SystemEntityCatalog.ApiAccess.name);
 
         this.addColumns(
             // _ID
@@ -80,8 +80,8 @@ export class ApiAccess extends EntityClass {
                 column : "user_id",
                 references : {
                     column : "_id",
-                    inEntity : EntityCatalog.User.name,
-                    inTable : EntityCatalog.User.table_name,
+                    inEntity : SystemEntityCatalog.User.name,
+                    inTable : SystemEntityCatalog.User.table_name,
                 }
             },
             // Role ID
@@ -90,8 +90,8 @@ export class ApiAccess extends EntityClass {
                 column : "role_id",
                 references : {
                     column : "_id",
-                    inEntity : EntityCatalog.Role.name,
-                    inTable : EntityCatalog.Role.table_name,
+                    inEntity : SystemEntityCatalog.Role.name,
+                    inTable : SystemEntityCatalog.Role.table_name,
                 }
             }
         );
@@ -114,7 +114,7 @@ export class ApiAccess extends EntityClass {
 
     protected buildSchema(): EntitySchema {
         return new EntitySchema({
-            table_name: EntityCatalog.ApiAccess.table_name,
+            table_name: SystemEntityCatalog.ApiAccess.table_name,
             is_system_entity: true
         });
     }

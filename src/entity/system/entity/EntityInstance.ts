@@ -1,5 +1,5 @@
 import { EntityClass } from "../../EntityClass.js";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
 import Knex from "knex";
@@ -11,11 +11,9 @@ export class EntityInstance extends EntityClass {
     }
 
     constructor() {
-        super(EntityCatalog.Entity.name);
+        super(SystemEntityCatalog.Entity.name);
 
         this.addColumns(
-            // ID
-            this.buildDefaultIdColumn(),
 
             // Name
             {
@@ -28,7 +26,7 @@ export class EntityInstance extends EntityClass {
                     column_name: "name",
                     sql_type: "VARCHAR",
                     nullable: false,
-                    column_keys: ["UNI"]
+                    column_keys: ["PRI","UNI"]
                 }
             },
 
@@ -99,7 +97,8 @@ export class EntityInstance extends EntityClass {
                 column: "connection_id",
                 references: {
                     column: "_id",
-                    inEntity: EntityCatalog.Connection.name
+                    inEntity: SystemEntityCatalog.Connection.name,
+                    inTable : SystemEntityCatalog.Connection.table_name
                 }
             }
         );
@@ -116,7 +115,7 @@ export class EntityInstance extends EntityClass {
 
     protected buildSchema() {
         return new EntitySchema({
-            table_name: EntityCatalog.Entity.table_name,
+            table_name: SystemEntityCatalog.Entity.table_name,
             is_system_entity: true
         });
     }

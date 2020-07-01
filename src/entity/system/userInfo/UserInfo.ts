@@ -1,14 +1,13 @@
-import { EntityClass } from "../../EntityClass";
-import { EntitySchema } from "../../../database/schema/sql/EntitySchema";
-import { ResourceCatalog } from "../../../database/schema/ResourceCatalog.js";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { EntityClass } from "../../EntityClass.js";
+import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
 export class UserInfo extends EntityClass {
 
 
     constructor() {
-        super(EntityCatalog.UserInfo.name);
+        super(SystemEntityCatalog.UserInfo.name);
 
         this.addColumns(
             // User ID
@@ -107,7 +106,7 @@ export class UserInfo extends EntityClass {
 
     protected buildSchema(): EntitySchema {
         return new EntitySchema({
-            table_name: ResourceCatalog.UserInfo.table_name,
+            table_name: SystemEntityCatalog.UserInfo.table_name,
             is_system_entity: true
         });
     }

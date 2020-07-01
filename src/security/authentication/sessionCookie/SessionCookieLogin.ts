@@ -2,7 +2,7 @@ import { System } from "../../../System.js";
 import jwt from 'jsonwebtoken';
 import { AuthenticationConfig } from "../AuthenticationConfig.js";
 import { UserAccessTokenInfo, UserRefreshTokenInfo } from "../../../user/auth/UserAuthentication.js";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 import { IPersistentLogin } from "../../../database/schemaInterface/IPersistentLogin.js";
 import { User } from "../../../user/User.js";
 import { ILoginMethod, LoginReturn, LoginOptions } from "../interfaces/IAuthenticationMethod.js";
@@ -14,14 +14,14 @@ export class SessionCookieLogin implements ILoginMethod {
 
         // Inavlidate previous sessions
         await system.getConnection()
-            .table(EntityCatalog.PersistentLogin.table_name)
+            .table(SystemEntityCatalog.PersistentLogin.table_name)
             .update({ status: "inactive" })
             .where("username", user.username);
 
         let persist = await system
             .entityManager()
-            .getEntity(EntityCatalog.PersistentLogin.name)
-            .createRow<IPersistentLogin>();
+            .getEntity(SystemEntityCatalog.PersistentLogin.name)
+            .row<IPersistentLogin>();
 
         persist.set({
             login_time: new Date(Date.now()),
@@ -93,7 +93,7 @@ export class SessionCookieLogin implements ILoginMethod {
     protected async validateToken(system: System, token: string, username: string): Promise<boolean> {
         return system.getConnection()
             .select<IPersistentLogin[]>("_id")
-            .from(EntityCatalog.PersistentLogin.table_name)
+            .from(SystemEntityCatalog.PersistentLogin.table_name)
             .where("token", token)
             .where("username", username)
             .where("status", "active")

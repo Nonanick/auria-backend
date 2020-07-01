@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { EntityManager } from "./database/EntityManager.js";
+import { EntityManager } from "./entity/EntityManager.js";
 import { DupplicatedURI } from "./exception/system/DupplicatedURI.js";
 import { ModuleManager } from "./module/ModuleManager.js";
 import { AuriaException, ISystemResponse } from "auria-lib";
@@ -21,9 +21,9 @@ import { EntitySchema } from "./database/schema/sql/EntitySchema.js";
 import { ISystemRequest } from "./http/ISystemRequest.js";
 import Knex from "knex";
 import { BootSequence } from "./boot/BootSequence.js";
-import { DataListener } from "./api/system/data/DataListener.js";
 import { DataRepository } from './data/repository/DataRepository.js';
 import { ConnectionDefinition } from "./database/connection/ConnectionDefinition.js";
+import { EntityClass } from "./entity/EntityClass.js";
 
 export abstract class System extends EventEmitter implements IApiListener {
 
@@ -64,7 +64,7 @@ export abstract class System extends EventEmitter implements IApiListener {
         return async () => {
             this.addApiListener(new AuthListener(this));
             this.addApiListener(new UserListener(this));
-            this.addApiListener(new DataListener(this));
+            // this.addApiListener(new DataListener(this));
             return true;
         };
     };
@@ -112,19 +112,19 @@ export abstract class System extends EventEmitter implements IApiListener {
 
     public abstract getConnectionDefinition(): ConnectionDefinition;
 
-    public getConnection() : Knex {
+    public getConnection(): Knex {
 
         const definition = this.getConnectionDefinition();
-        
+
         return Knex({
-            client : definition.client,
-            connection : {
-                driver : definition.client,
-                host : definition.host,
-                user : definition.user,
-                password : definition.password,
-                database : definition.database,
-                port : definition.port,
+            client: definition.client,
+            connection: {
+                driver: definition.client,
+                host: definition.host,
+                user: definition.user,
+                password: definition.password,
+                database: definition.database,
+                port: definition.port,
 
             }
         });
@@ -247,37 +247,29 @@ export abstract class System extends EventEmitter implements IApiListener {
 
         const filter = filterEntity || "";
 
-        const matchFilter = (name: EntitySchema) => {
+        const matchFilter = (name: EntityClass) => {
             return filter == ""
-                || String(name.get("name")).toLocaleLowerCase().indexOf(filter.toLocaleLowerCase()) >= 0;
+                || String(name.name).toLocaleLowerCase().indexOf(filter.toLocaleLowerCase()) >= 0;
         };
 
-        const allEntities = this.entityManager().getAllEntities();
-        // Build Schema
+        const allEntities = this.entityManager().getAllSystemEntities();
+
+        // Build Schema - Add/Alter tables
         for (let a = 0; a < allEntities.length; a++) {
-            const EntitySchema = allEntities[a];
-            if (matchFilter(EntitySchema))
-                await EntitySchema.install(this.getConnection());
+            const entity = allEntities[a];
+            if (matchFilter(entity))
+                await entity.schema.install(this.getConnection());
         }
-        // Register as Rows
-        for (let b = 0; b < allEntities.length; b++) {
-            const EntitySchema = allEntities[b];
-            if (matchFilter(EntitySchema)) {
-                await EntitySchema.save();
-                let cols = EntitySchema.getColumns();
-                for (let c = 0; c < cols.length; c++) {
-                    await cols[c].save();
-                }
-            }
-        }
+
         // Build References
         for (let a = 0; a < allEntities.length; a++) {
-            const EntitySchema = allEntities[a];
-            if (matchFilter(EntitySchema)) {
-                await EntitySchema.installReferences(this.getConnection());
+            const entity = allEntities[a];
+            if (matchFilter(entity)) {
+                await entity.schema.installReferences(this.getConnection());
             }
         }
-        return allEntities.map(r => r.get("name"));
+
+        return allEntities.map(r => r.name);
 
     }
 

@@ -1,8 +1,7 @@
-import { EntityClass } from "../../EntityClass";
-import { EntitySchema } from "../../../database/schema/sql/EntitySchema";
-import { ModulePageSchema } from "../../../database/schema/ModulePage";
+import { EntityClass } from "../../EntityClass.js";
+import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 
 export class ModulePage extends EntityClass {
 
@@ -12,18 +11,9 @@ export class ModulePage extends EntityClass {
     public getBootFunction(): () => boolean | Promise<boolean> {
         return () => true;
     }
-    protected buildInfo(): IEntityInfo {
-        return {
-            title: "@{Auria.Entity.ModulePage.Title}",
-            description: "@{Auria.Entity.ModulePage.Description}",
-        };
-    }
-    protected buildSchema(): EntitySchema {
-        return new ModulePageSchema();
-    }
 
     constructor() {
-        super(EntityCatalog.ModulePage.name);
+        super(SystemEntityCatalog.ModulePage.name);
 
         this.addColumns(
             // _ID
@@ -212,8 +202,8 @@ export class ModulePage extends EntityClass {
                 column: "module_id",
                 references: {
                     column: "_id",
-                    inEntity: EntityCatalog.Module.name,
-                    inTable: EntityCatalog.Module.table_name
+                    inEntity: SystemEntityCatalog.Module.name,
+                    inTable: SystemEntityCatalog.Module.table_name
                 }
             },
             // Parent Menu ID
@@ -222,11 +212,24 @@ export class ModulePage extends EntityClass {
                 column: "parent_menu_id",
                 references: {
                     column: "_id",
-                    inEntity: EntityCatalog.ModuleMenu.name,
-                    inTable: EntityCatalog.ModuleMenu.table_name
+                    inEntity: SystemEntityCatalog.ModuleMenu.name,
+                    inTable: SystemEntityCatalog.ModuleMenu.table_name
                 }
             }
         );
+    }
+
+    protected buildInfo(): IEntityInfo {
+        return {
+            title: "@{Auria.Entity.ModulePage.Title}",
+            description: "@{Auria.Entity.ModulePage.Description}",
+        };
+    }
+    protected buildSchema(): EntitySchema {
+        return new EntitySchema({
+            table_name: SystemEntityCatalog.ModulePage.table_name,
+            is_system_entity: true
+        });
     }
 
 }

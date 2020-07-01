@@ -22,11 +22,11 @@ export class Row<T = any> extends EventEmitter {
     private primaryKey!: keyof T;
 
     /**
-     * Data
+     * Values
      * -----
      * Holds all the data coming from the database
      */
-    private data: Partial<T> = {};
+    private values: Partial<T> = {};
 
     /**
      * Custom Getter
@@ -103,7 +103,7 @@ export class Row<T = any> extends EventEmitter {
      */
     public copyInto(target: Row<T>): Row<T> {
 
-        target.set({ ...this.data, _id: undefined });
+        target.set({ ...this.values, _id: undefined });
 
         this.customGetters.forEach((getter, fieldName) => {
             target.replaceGetterFunction(fieldName, getter);
@@ -139,10 +139,10 @@ export class Row<T = any> extends EventEmitter {
 
     public get(property: keyof T) {
         if (this.customGetters.has(property)) {
-            return this.customGetters.get(property)!(this.data[property]);
+            return this.customGetters.get(property)!(this.values[property]);
         }
 
-        return this.data[property];
+        return this.values[property];
     }
 
     public set(property: keyof T, value: any): Row<T>;
@@ -160,16 +160,16 @@ export class Row<T = any> extends EventEmitter {
 
         for (let propName in propertiesOrName) {
             if (propertiesOrName.hasOwnProperty(propName)) {
-                const oldValue = this.data[propName];
+                const oldValue = this.values[propName];
 
                 if (this.customSetters.has(propName)) {
-                    this.data[propName] = this.customSetters.get(propName)!(value);
+                    this.values[propName] = this.customSetters.get(propName)!(value);
                 } else {
-                    this.data[propName] = propertiesOrName[propName];
+                    this.values[propName] = propertiesOrName[propName];
                 }
 
                 // Each time a set is done and the value is different set the state as unsynced
-                if (oldValue != this.data[propName]) {
+                if (oldValue != this.values[propName]) {
                     // Push value into changed attributes!
                     if (this.changedAttributes.indexOf(propName) < 0) this.changedAttributes.push(propName);
                     // If previous state of row is "SYNCED" make it "UNSYNCED"!
@@ -265,6 +265,12 @@ export class Row<T = any> extends EventEmitter {
         }
     }
 
+    public async startSaveTransaction() : Promise<Transaction> {
+        const tx = await this.connection.transaction();
+        await this.save(tx);
+        return tx;
+    }
+
     protected async create(transaction?: Transaction): Promise<boolean> {
         if (this.tableName == null) {
             throw new RowInformationMissing("To update/create a row please provide its connection + table name!");
@@ -344,7 +350,7 @@ export class Row<T = any> extends EventEmitter {
     public asJSON(keys?: (keyof T)[]): T {
 
         let ans: Partial<T> = {};
-        const returnedKeys = keys || (Object.keys(this.data) as (keyof T)[]);
+        const returnedKeys = keys || (Object.keys(this.values) as (keyof T)[]);
 
         for (let index = 0; index < returnedKeys.length; index++) {
             ans[returnedKeys[index]] = this.get(returnedKeys[index]);
@@ -357,7 +363,7 @@ export class Row<T = any> extends EventEmitter {
 
         delete this.setProxies;
         delete this.getProxies;
-        delete this.data;
+        delete this.values;
         delete this.customSetters;
         delete this.customGetters;
         delete this.changedAttributes;

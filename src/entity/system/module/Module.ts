@@ -1,12 +1,12 @@
-import { EntityClass } from "../../EntityClass";
-import { EntitySchema } from "../../../database/schema/sql/EntitySchema";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { EntityClass } from "../../EntityClass.js";
+import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
 export class Module extends EntityClass {
 
     constructor() {
-        super(EntityCatalog.Module.name);
+        super(SystemEntityCatalog.Module.name);
 
         this.addColumns(
             // _ID
@@ -120,7 +120,7 @@ export class Module extends EntityClass {
 
     protected buildSchema(): EntitySchema {
         return new EntitySchema({
-            table_name: EntityCatalog.Module.table_name,
+            table_name: SystemEntityCatalog.Module.table_name,
             is_system_entity: true
         })
     }

@@ -1,8 +1,8 @@
 import { EventEmitter } from "events";
 import { ReferenceSchema } from "../database/schema/sql/ReferenceSchema.js";
+import { EntityClass } from "./EntityClass.js";
 
 export class ReferenceClass extends EventEmitter {
-
 
     protected _name!: string;
     public get name() {
@@ -10,22 +10,25 @@ export class ReferenceClass extends EventEmitter {
     }
 
     protected _schema !: ReferenceSchema;
+    
     public get schema() {
         return this._schema;
     }
 
-    constructor(params: ReferenceClassParameters) {
+    constructor(entity: EntityClass, params: ReferenceClassParameters) {
         super();
-        
+
         this._name = params.name;
 
         this._schema = new ReferenceSchema({
             name: params.name,
+            entity: entity.name,
+            table: entity.schema.get("table_name"),
             column: params.column,
             referenced_column: params.references.column,
             referenced_entity: params.references.inEntity,
             referenced_schema: params.references.inSchema,
-            referenced_table: params.references.inTable
+            referenced_table: params.references.inTable 
         });
 
     }
@@ -37,7 +40,7 @@ export interface ReferenceClassParameters {
     references: {
         column: string;
         inEntity?: string;
-        inTable?: string;
+        inTable: string;
         inSchema?: string;
     };
 }

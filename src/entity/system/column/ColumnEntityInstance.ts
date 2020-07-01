@@ -1,13 +1,12 @@
 import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
 import { EntityClass } from "../../EntityClass.js";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
 export class ColumnEntityInstance extends EntityClass {
 
-
     constructor() {
-        super(EntityCatalog.Column.name);
+        super(SystemEntityCatalog.Column.name);
 
         this.addColumns(
             // _ID
@@ -21,7 +20,7 @@ export class ColumnEntityInstance extends EntityClass {
                     description: "@{Auria.Column.Column.EntityId.Description}",
                 },
                 schema: {
-                    column_name: "entity_id",
+                    column_name: "entity_name",
                     sql_type: "CHAR",
                     length: 22,
                     column_keys: ["IND"],
@@ -193,7 +192,7 @@ export class ColumnEntityInstance extends EntityClass {
                     default_value: true
                 }
             },
-            // Readable
+            // Required
             {
                 name: "Required",
                 info: {
@@ -212,10 +211,23 @@ export class ColumnEntityInstance extends EntityClass {
             // Status
             this.buildDefaultStatusColumn(),
         );
+
+        this.addReferences(
+            // Entity Name
+            {
+                name : "Column_Belongs_To_Entity",
+                column : "entity_name",
+                references : {
+                    column : "name",
+                    inEntity : SystemEntityCatalog.Entity.name,
+                    inTable :  SystemEntityCatalog.Entity.table_name,
+                }
+            }
+        );
     }
 
     public getBootDependencies(): string[] {
-        return [`BootOfEntity(${EntityCatalog.Entity.name})`];
+        return [`BootOfEntity(${SystemEntityCatalog.Entity.name})`];
     }
 
     public getBootFunction(): () => boolean | Promise<boolean> {
@@ -231,7 +243,7 @@ export class ColumnEntityInstance extends EntityClass {
 
     protected buildSchema(): EntitySchema {
         return new EntitySchema({
-            table_name: EntityCatalog.Column.table_name,
+            table_name: SystemEntityCatalog.Column.table_name,
             is_system_entity: true
         });
     }

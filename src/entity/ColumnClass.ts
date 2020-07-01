@@ -91,6 +91,10 @@ export class ColumnClass extends EventEmitter implements Bootable {
         return () => true;
     }
 
+    public hasKey(key: "PRI" | "UNI" | "IND") {
+        return this.schema.get("column_keys").includes(key);
+    }
+
 }
 
 export interface ColumnClassParameters {

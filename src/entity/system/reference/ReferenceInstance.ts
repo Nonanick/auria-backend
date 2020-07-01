@@ -1,12 +1,12 @@
 import { EntityClass } from "../../EntityClass.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 
 export class ReferenceInstance extends EntityClass {
 
     constructor() {
-        super(EntityCatalog.Reference.name);
+        super(SystemEntityCatalog.Reference.name);
 
         this.addColumns(
             // _ID
@@ -108,7 +108,7 @@ export class ReferenceInstance extends EntityClass {
 
     protected buildSchema() {
         return new EntitySchema({
-            table_name: EntityCatalog.Reference.table_name,
+            table_name: SystemEntityCatalog.Reference.table_name,
             is_system_entity: true
         });
     }

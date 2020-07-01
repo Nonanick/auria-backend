@@ -1,12 +1,12 @@
-import { EntityClass } from "../../EntityClass";
-import { EntitySchema } from "../../../database/schema/sql/EntitySchema";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { EntityClass } from "../../EntityClass.js";
+import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
 export class EntityRowAccessShare extends EntityClass {
     
     constructor() {
-        super(EntityCatalog.EntityRowAccessShare.name);
+        super(SystemEntityCatalog.EntityRowAccessShare.name);
 
         this.addColumns(
             // _ID
@@ -14,13 +14,13 @@ export class EntityRowAccessShare extends EntityClass {
 
             // Entity ID
             {
-                name: "Entity ID",
+                name: "Entity Name",
                 info: {
-                    title: "@{Auria.Column.EntityAccessShare.EntityID.Title}",
-                    description: "@{Auria.Column.EntityAccessShare.EntityID.Description}",
+                    title: "@{Auria.Column.EntityAccessShare.EntityName.Title}",
+                    description: "@{Auria.Column.EntityAccessShare.EntityName.Description}",
                 },
                 schema: {
-                    column_name: "entity_id",
+                    column_name: "entity_name",
                     sql_type: "CHAR",
                     length: 22,
                     nullable: false,
@@ -141,7 +141,7 @@ export class EntityRowAccessShare extends EntityClass {
 
     protected buildSchema(): EntitySchema {
         return new EntitySchema({
-            table_name: EntityCatalog.EntityRowAccessShare.table_name,
+            table_name: SystemEntityCatalog.EntityRowAccessShare.table_name,
             is_system_entity: true
         });
     }

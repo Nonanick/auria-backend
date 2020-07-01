@@ -4,9 +4,9 @@ import { IDataFilterContext } from "../IDataFilterContext.js";
 
 class ActiveStatusFilterProviderClass implements IDataFilterProvider {
 
-    public applyFilter(query: QueryBuilder,  context: IDataFilterContext) {
+    public applyFilter(query: QueryBuilder, context: IDataFilterContext) {
 
-        if (context.avaliableColumns.includes("status")) {
+        if (context.entity.schema.hasColumn("status")) {
             query.where("status", "active");
         }
 

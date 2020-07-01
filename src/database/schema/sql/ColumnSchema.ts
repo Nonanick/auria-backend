@@ -1,12 +1,19 @@
-import Knex, { AlterTableBuilder, ColumnBuilder, Transaction } from "knex";
+import Knex, { AlterTableBuilder, ColumnBuilder, Transaction, CreateTableBuilder } from "knex";
 import { SQLTypes } from "./SQLTypes.js";
-import { EntityCatalog } from "../EntityCatalog.js";
-import { IColumn } from "../../schemaInterface/IColumn.js";
 import { EntitySchema } from "./EntitySchema.js";
-import { DefaultSchema } from "../default/DefaultRow.js";
+import { Row } from "../../Row.js";
 
-export class ColumnSchema extends DefaultSchema<ColumnSchemaParameters> {
+export class ColumnSchema extends Row<ColumnSchemaParameters> {
 
+    protected __alreadyInstalled: boolean = false;
+
+    public markAsAlreadyInstalled(): void {
+        this.__alreadyInstalled = true;
+    }
+
+    public isMarkedAsInstalled(): boolean {
+        return this.__alreadyInstalled;
+    }
     protected entity!: EntitySchema;
 
     constructor(data?: Partial<ColumnSchemaParameters> & Required<Pick<ColumnSchemaParameters, RequiredColumnParameters>>) {
@@ -59,56 +66,6 @@ export class ColumnSchema extends DefaultSchema<ColumnSchemaParameters> {
             });
     }
 
-    public async save(transaction?: Transaction): Promise<boolean> {
-
-
-        //this.set("entity_id", this.entity.get("_id"));
-
-        return this.connection
-            .table(EntityCatalog.Column.table_name)
-            //.where("entity_id", this.get("entity_id"))
-            //.where("name", this.get("name"))
-            .where("column_name", this.get("column_name"))
-            .select('*')
-            .then(async (res) => {
-                const data = await this.asJSON();
-
-                if (res.length == 0) {
-
-                    return this.connection
-                        .insert(data)
-                        .into(EntityCatalog.Column.table_name)
-                        .then((insertIds) => {
-                            //this.set("_id", insertIds[0]);
-                            this.setRowState("SYNCED");
-                            return true;
-                        });
-                } else if (res.length == 1) {
-                    this.set("_id", res[0]._id);
-                    delete data._id;
-                    return this.connection
-                        .table(EntityCatalog.Column.table_name)
-                        .update(data)
-                       // .where("entity_id", this.get("entity_id"))
-                      //  .where("name", this.get("name"))
-                        .where("column_name", this.get("column_name"))
-                        .then((updated) => {
-                            if (updated == 1) {
-                                this.setRowState("SYNCED");
-                            } else if (updated > 1) {
-                                console.error("Multiple rows updated when there was supposed to be only one!");
-                            } else {
-                                console.error("Failed to find row?????? Select was fine tou");
-                            }
-
-                            return true;
-                        });
-                } else {
-                    return false;
-                }
-            });
-    };
-
     protected async installAlterInTable() {
         return this.connection.schema.alterTable(this.entity.get("table_name"), (builder) => {
             return this.buildColumnWithBuilder(builder).alter();
@@ -133,7 +90,7 @@ export class ColumnSchema extends DefaultSchema<ColumnSchemaParameters> {
         });
     }
 
-    protected buildColumnWithBuilder(builder: AlterTableBuilder): ColumnBuilder {
+    public buildColumnWithBuilder(builder: AlterTableBuilder | CreateTableBuilder): ColumnBuilder {
         let column: ColumnBuilder;
         const columnName = this.get("column_name");
 
@@ -186,6 +143,7 @@ export class ColumnSchema extends DefaultSchema<ColumnSchemaParameters> {
 
         return column;
     }
+
 }
 
 export type RequiredColumnParameters = "column_name" | "sql_type";
@@ -198,7 +156,7 @@ export interface ColumnSchemaParameters {
     default_value: any;
     nullable: boolean;
     column_keys: ("UNI" | "IND" | "PRI")[];
-    readable? : boolean;
-    required? : boolean;
-    comment? : string;
+    readable?: boolean;
+    required?: boolean;
+    comment?: string;
 }

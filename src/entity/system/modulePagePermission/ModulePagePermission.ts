@@ -1,12 +1,12 @@
-import { EntityClass } from "../../EntityClass";
-import { EntitySchema } from "../../../database/schema/sql/EntitySchema";
-import { EntityCatalog } from "../../../database/schema/EntityCatalog.js";
+import { EntityClass } from "../../EntityClass.js";
+import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
+import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 
 export class ModulePagePermission extends EntityClass {
 
     constructor() {
-        super(EntityCatalog.ModulePagePermission.name);
+        super(SystemEntityCatalog.ModulePagePermission.name);
 
         this.addColumns(
             // ID
@@ -70,8 +70,8 @@ export class ModulePagePermission extends EntityClass {
                 column : "role_id",
                 references : {
                     column : "_id",
-                    inEntity : EntityCatalog.Role.name,
-                    inTable : EntityCatalog.Role.table_name,
+                    inEntity : SystemEntityCatalog.Role.name,
+                    inTable : SystemEntityCatalog.Role.table_name,
                 }
             },
             // User ID
@@ -80,8 +80,8 @@ export class ModulePagePermission extends EntityClass {
                 column : "user_id",
                 references : {
                     column : "_id",
-                    inEntity : EntityCatalog.User.name,
-                    inTable : EntityCatalog.User.table_name,
+                    inEntity : SystemEntityCatalog.User.name,
+                    inTable : SystemEntityCatalog.User.table_name,
                 }
             },
             // Page ID
@@ -90,8 +90,8 @@ export class ModulePagePermission extends EntityClass {
                 column : "page_id",
                 references : {
                     column : "_id",
-                    inEntity : EntityCatalog.ModulePage.name,
-                    inTable : EntityCatalog.ModulePage.table_name,
+                    inEntity : SystemEntityCatalog.ModulePage.name,
+                    inTable : SystemEntityCatalog.ModulePage.table_name,
                 }
             }
         );
@@ -115,7 +115,7 @@ export class ModulePagePermission extends EntityClass {
 
     protected buildSchema(): EntitySchema {
         return new EntitySchema({
-            table_name: EntityCatalog.ModulePagePermission.table_name,
+            table_name: SystemEntityCatalog.ModulePagePermission.table_name,
             is_system_entity: true,
         });
     }

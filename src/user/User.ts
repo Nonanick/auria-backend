@@ -2,7 +2,7 @@ import { System } from "../System.js";
 import { AuriaRow } from "../database/schema/default/AuriaRow.js";
 import { UserAuthentication } from "./auth/UserAuthentication.js";
 import { Bootable } from "../boot/Bootable.js";
-import { EntityCatalog } from "../database/schema/EntityCatalog.js";
+import { SystemEntityCatalog } from "../database/schema/SystemEntityCatalog.js";
 import { IUserInfo } from "../database/schemaInterface/IUserInfo.js";
 import { EventEmitter } from "events";
 import { IUser } from "../database/schemaInterface/IUser.js";
@@ -109,7 +109,7 @@ export class User extends EventEmitter implements Bootable {
 
             this._loadedPromise = system
                 .entityManager()
-                .getEntity(EntityCatalog.User.name)
+                .getEntity(SystemEntityCatalog.User.name)
                 .row<IUser>()
                 .byId(username, "username")
                 .then((userRow) => {
@@ -182,7 +182,7 @@ export class User extends EventEmitter implements Bootable {
             // TODO boot user routine
             this.info = await this.system
                 .entityManager()
-                .getEntity(EntityCatalog.UserInfo.name)
+                .getEntity(SystemEntityCatalog.UserInfo.name)
                 .row<IUserInfo>()
                 .byId(this.userRow.get("_id"), "user_id");
 

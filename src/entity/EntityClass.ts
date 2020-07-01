@@ -5,21 +5,36 @@ import { Bootable } from "../boot/Bootable.js";
 import { IDataFilterProvider } from "../database/query/IDataFilterProvider.js";
 import { ColumnClass, ColumnClassParameters } from "./ColumnClass.js";
 import { ColumnSchema } from "../database/schema/sql/ColumnSchema.js";
-import { ProcedureCatalog } from "./standart/procedures/ProcedureCatalog.js";
 import { ReferenceClass, ReferenceClassParameters } from "./ReferenceClass.js";
 import { EntitySchema } from "../database/schema/sql/EntitySchema.js";
 import { IEntityAccessRule } from "./standart/accessRules/IEntityAccessRule.js";
 import { IEntityProcedure } from "./standart/procedures/IEntityProcedure.js";
-import { IEntityFacade } from "./standart/facade/IResourceFacade.js";
+import { IEntityFacade } from "./standart/facade/IEntityFacade.js";
 import { IEntityInfo } from "./standart/info/IEntityInfo.js";
 import { ConnectionDefinition } from "../database/connection/ConnectionDefinition.js";
 import { ConnectionManager } from "../database/connection/ConnectionManager.js";
 import { DefaultSchemaData } from "../database/schemaInterface/default/DefaultSchemaData.js";
 import { AuriaRow } from "../database/schema/default/AuriaRow.js";
+import { IEntity } from "../database/schemaInterface/IEntity.js";
+import { IRowProcedure } from "./standart/procedures/row/IRowProcedure.js";
 
 export abstract class EntityClass extends EventEmitter implements Bootable {
 
+    protected _systemConnection!: Knex;
+
+    public get systemConnection(): Knex {
+        return this._systemConnection;
+    }
+
+    public set systemConnection(conn: Knex) {
+        this._systemConnection = conn;
+    }
+
     protected _connection!: Knex;
+
+    public get connection(): Knex {
+        return this._connection;
+    }
 
     protected _connectionDefinition?: ConnectionDefinition;
 
@@ -32,7 +47,16 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
     protected _schema!: EntitySchema;
 
     public get schema(): EntitySchema {
+        if (this._schema == null)
+            this._schema = this.buildSchema();
+
         return this._schema;
+    }
+
+    protected _auriaRow!: AuriaRow<IEntity>;
+
+    public get auriaRow() {
+        return this._auriaRow;
     }
 
     protected _info: IEntityInfo;
@@ -50,8 +74,12 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
         [name: string]: IEntityAccessRule
     } = {};
 
-    protected _procedures: {
+    protected _entityProcedures: {
         [name: string]: IEntityProcedure
+    } = {};
+
+    protected _rowProcedures: {
+        [name: string]: IRowProcedure
     } = {};
 
     protected _references: {
@@ -96,7 +124,7 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
             },
             hooks: {
                 // Before INSERT make sure _id is not null!
-                [ProcedureCatalog.CREATE]: (context) => {
+                ["CREATE"]: (context) => {
                     if (context.procedureData._id == null)
                         context.procedureData._id = nanoid(22);
                 }
@@ -105,6 +133,13 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
         });
     }
 
+    public getPrimaryColumn(): ColumnClass | undefined {
+        for (const column in this._columns) {
+            if (this._columns[column].hasKey("PRI")) {
+                return this._columns[column];
+            }
+        }
+    }
 
     protected buildDefaultStatusColumn(): ColumnClass {
         return new ColumnClass({
@@ -145,24 +180,44 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
         }
     }
 
-    public addProcedures(...procedures: IEntityProcedure[]) {
+    public addEntityProcedures(...procedures: IEntityProcedure[]) {
         if (Array.isArray(procedures)) {
             for (let procedure of procedures) {
-                this._procedures[procedure.name] = procedure;
+                this._entityProcedures[procedure.name] = procedure;
             }
         }
     }
 
-    public removeProcedure(name: string) {
-        if (this._procedures[name] != null) {
-            delete this._procedures[name];
+    public removeEntityProcedure(name: string) {
+        if (this._entityProcedures[name] != null) {
+            delete this._entityProcedures[name];
         } else {
             console.warn("WARN! Entity ", this.name, " does not possess procedure ", name, " ignoring remove request!");
         }
     }
 
-    public hasProcedure(name: string) {
-        return this._procedures[name] != null;
+    public hasEntityProcedure(name: string) {
+        return this._entityProcedures[name] != null;
+    }
+
+    public addRowProcedures(...procedures: IRowProcedure[]) {
+        if (Array.isArray(procedures)) {
+            for (let procedure of procedures) {
+                this._rowProcedures[procedure.name] = procedure;
+            }
+        }
+    }
+
+    public removeRowProcedure(name: string) {
+        if (this._rowProcedures[name] != null) {
+            delete this._rowProcedures[name];
+        } else {
+            console.warn("WARN! Entity ", this.name, " does not possess procedure ", name, " ignoring remove request!");
+        }
+    }
+
+    public hasRowProcedure(name: string) {
+        return this._rowProcedures[name] != null;
     }
 
     public addReferences(...references: (ReferenceClass | ReferenceClassParameters)[]) {
@@ -174,8 +229,9 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
                     this._references[reference.name] = reference;
                     this._schema.addReferences(reference.schema);
                 } else {
-                    const refClass = new ReferenceClass(reference);
+                    const refClass = new ReferenceClass(this, reference);
                     this._references[reference.name] = refClass;
+                    this._schema.addReferences(refClass.schema);
                 }
             }
         }
@@ -190,9 +246,9 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
         }
     }
 
-    public addFacades(...facades : IEntityFacade[]) {
-        if(Array.isArray(facades)) {
-            for(let facade of facades) {
+    public addFacades(...facades: IEntityFacade[]) {
+        if (Array.isArray(facades)) {
+            for (let facade of facades) {
                 this._facades[facade.name] = facade;
             }
         }
@@ -208,7 +264,7 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
 
     public setConnection(connection: Knex | ConnectionDefinition) {
 
-        if (connection instanceof Knex) {
+        if (typeof connection === "function") {
             this._connection = connection as Knex;
             delete this._connectionDefinition;
         } else {
@@ -218,11 +274,11 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
 
     }
 
-    public row<T extends DefaultSchemaData>() : AuriaRow<T> {
+    public row<T extends DefaultSchemaData>(): AuriaRow<T> {
         let row = new AuriaRow<T>(this);
         return row;
     }
-  
+
     public getBootableName(): string {
         return `BootOfEntity(${this.schema.get("name")})`;
     }
