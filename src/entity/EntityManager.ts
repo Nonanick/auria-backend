@@ -91,7 +91,19 @@ export class EntityManager extends EventEmitter implements Bootable {
             return this.entities[name];
         }
 
+        if(this._systemEntities[name] != null) {
+            return this._systemEntities[name];
+        }
+
         throw new Error("[EntityManager] Entity with name " + name + " does NOT exists!");
+    }
+
+    public getSystemEntity(name : string) : EntityClass {
+        if(this._systemEntities[name] != null) {
+            return this._systemEntities[name];
+        }
+
+        throw new Error("[EntityManager] System Entity with name " + name + " does NOT exists!");
     }
 
 }

@@ -40,11 +40,13 @@ export class UserRoleRepository {
 
     }
 
-    public async getRolesId() : Promise<string[]> {
+    public async getRolesId(): Promise<string[]> {
         return this.build().then(_ => Array.from(Object.keys(this.roles)));
     }
 
     private async queryForUserRoles() {
+        await this.user.loaded();
+
         return Promise.resolve()
             .then(async _ => {
                 const conn = this.system.getConnection();

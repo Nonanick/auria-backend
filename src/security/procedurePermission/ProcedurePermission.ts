@@ -3,7 +3,6 @@ import { User } from "../../user/User.js";
 import { EntityClass } from "../../entity/EntityClass.js";
 import { ProcedureAuthority } from "../../entity/standart/procedures/ProcedureAuthority.js";
 import { SystemEntityCatalog } from "../../database/schema/SystemEntityCatalog.js";
-import { EntityProcedureHistory } from "../../entity/system/index.js";
 
 export type RequestForProcedurePermission = {
     user: User;

@@ -12,7 +12,6 @@ export class ConnectionManager {
             const conn = Knex({
                 client: definition.client,
                 connection: {
-                    driver: definition.driver,
                     host: definition.host,
                     port: definition.port,
                     user: definition.user,

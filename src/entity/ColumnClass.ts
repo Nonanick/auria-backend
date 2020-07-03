@@ -46,9 +46,7 @@ export class ColumnClass extends EventEmitter implements Bootable {
         return [...this._setProxies];
     }
 
-    protected _validators: {
-        [procedure: string]: IDataValidator[]
-    } = {};
+    protected _validators: IDataValidator[] = [];
 
     public get validators() {
         return { ...this._validators };
@@ -77,6 +75,47 @@ export class ColumnClass extends EventEmitter implements Bootable {
             title: params.info?.title ?? "",
             description: params.info?.description ?? ""
         };
+
+        // Normalize GET Proxies
+        if (params.getProxies) {
+            if (Array.isArray(params.getProxies)) {
+                this._getProxies = params.getProxies;
+            } else {
+                this._getProxies = [params.getProxies!];
+            }
+        }
+
+        // Normalize SET Proxies
+        if (params.setProxies) {
+            if (Array.isArray(params.setProxies)) {
+                this._setProxies = params.setProxies;
+            } else {
+                this._setProxies = [params.setProxies];
+            }
+        }
+
+        // Normalize Validators
+        if (params.validators) {
+            if (Array.isArray(params.validators)) {
+                this._validators = params.validators;
+            } else {
+                this._validators = [params.validators];
+            }
+        }
+
+        // Normalizae Hooks
+        if (params.hooks) {
+            for (let procedure in params.hooks) {
+                let hook = params.hooks[procedure];
+                if (Array.isArray(hook)) {
+                    this._hooks[procedure] = hook;
+                } else {
+                    this._hooks[procedure] = [hook];
+                }
+            }
+        }
+
+
     }
 
     public getBootDependencies(): string[] {

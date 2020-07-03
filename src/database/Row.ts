@@ -138,11 +138,23 @@ export class Row<T = any> extends EventEmitter {
     }
 
     public get(property: keyof T) {
-        if (this.customGetters.has(property)) {
-            return this.customGetters.get(property)!(this.values[property]);
+        let value = this.values[property];
+
+        if (this.getProxies.has(property)) {
+            for (let proxy of this.getProxies.get(property)!) {
+                let oldValue = value;
+                value = proxy(value) as any;
+                // Ignore empty return getProxies
+                if (value == null)
+                    value = oldValue;
+            };
         }
 
-        return this.values[property];
+        if (this.customGetters.has(property)) {
+            return this.customGetters.get(property)!(value);
+        }
+
+        return value;
     }
 
     public set(property: keyof T, value: any): Row<T>;
@@ -155,8 +167,6 @@ export class Row<T = any> extends EventEmitter {
             } as Partial<T>);
             return this.set(args);
         }
-
-
 
         for (let propName in propertiesOrName) {
             if (propertiesOrName.hasOwnProperty(propName)) {
@@ -265,7 +275,7 @@ export class Row<T = any> extends EventEmitter {
         }
     }
 
-    public async startSaveTransaction() : Promise<Transaction> {
+    public async startSaveTransaction(): Promise<Transaction> {
         const tx = await this.connection.transaction();
         await this.save(tx);
         return tx;
@@ -347,7 +357,7 @@ export class Row<T = any> extends EventEmitter {
         return this;
     }
 
-    public asJSON(keys?: (keyof T)[]): T {
+    public asJSON(keys?: (keyof T)[]): Partial<T> {
 
         let ans: Partial<T> = {};
         const returnedKeys = keys || (Object.keys(this.values) as (keyof T)[]);

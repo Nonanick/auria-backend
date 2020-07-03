@@ -113,6 +113,7 @@ export class User extends EventEmitter implements Bootable {
                 .row<IUser>()
                 .byId(username, "username")
                 .then((userRow) => {
+                    console.log("Row", userRow.asJSON());
                     this.userRow = userRow;
                     this._privilege = userRow.get("user_privilege");
                     return this;
@@ -154,7 +155,7 @@ export class User extends EventEmitter implements Bootable {
             console.error("Failed to get user ID!", err);
             throw err;
         });
-        return loaded.then(_ => this.info.get("_id"));
+        return loaded.then(_ => this.userRow.get("_id"));
     }
 
     public async getUserInfo(): Promise<AuriaRow<IUserInfo>> {

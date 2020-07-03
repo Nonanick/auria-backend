@@ -7,12 +7,14 @@ import { User } from "../../../user/User.js";
 import { ProcedureAuthority } from "../../../entity/standart/procedures/ProcedureAuthority.js";
 import { IEntityProcedureHook } from "../../../entity/standart/procedures/IEntityProcedureHook.js";
 import { ProcedureHookContext } from "../../../entity/standart/procedures/ProcedureHookContext.js";
-import Knex from "knex";
+import { ProcedurePermission } from "../../../security/procedurePermission/ProcedurePermission.js";
+import { RowProcedureCatalog } from "../../../entity/standart/procedures/row/RowProcedureCatalog.js";
+import { UserUnauthorizedToExecuteProcedure } from "../../../exception/system/security/UserUnauthorizedToExecuteProcedure.js";
 
 export class AuriaRow<T extends DefaultSchemaData> extends Row<T> {
 
-    protected systemConnection! : Knex;
-    
+    protected procedurePermission!: ProcedurePermission;
+
     private entity: EntityClass;
 
     protected procedureHooks: {
@@ -24,21 +26,32 @@ export class AuriaRow<T extends DefaultSchemaData> extends Row<T> {
         this.entity = entity;
         this.setTableName(entity.schema.get("table_name"));
         this.setRowState("NOT_ON_DATABASE");
-
+       // console.log("[---------- Apply entity rules!", entity);
         this.applyEntityRules(entity);
     }
 
-    public runProcedure<T extends DefaultSchemaData = any>(user: User, procedure: string, authority?: ProcedureAuthority) {
+    public runProcedure(user: User, procedure: keyof typeof RowProcedureCatalog, authority?: ProcedureAuthority) {
         if (this.entity.hasRowProcedure(procedure)) {
-            this.checkUserPermission(user, procedure);
+            const permissionToExecute = this.checkUserPermission(user, procedure);
+            if (permissionToExecute) {
+                return RowProcedureCatalog[procedure]
+                    .run<T>({
+                        entity: this.entity,
+                        row: this,
+                        user: user,
+                        authority
+                    });
+            } else {
+                throw new UserUnauthorizedToExecuteProcedure("Cannot execute procedure! User lacks authority!");
+            }
         } else {
-            console.error("[AuriaRow] Entity does not possess procedure!");
+            console.error("[AuriaRow] Row does not possess procedure!");
             throw new InvalidEntityProcedure(`Entity '${this.entity.name}' does not accept procedure ${procedure}`);
         }
     }
 
-    public setSystemConnection(connection : Knex) {
-        this.systemConnection = connection;
+    public setProcedurePermissions(permission: ProcedurePermission) {
+        this.procedurePermission = permission;
     }
 
     private applyEntityRules(entity: EntityClass) {
@@ -52,6 +65,7 @@ export class AuriaRow<T extends DefaultSchemaData> extends Row<T> {
 
             // Validators
             this.applyValidatorsFromColumn(column);
+
         }
     }
 
@@ -71,6 +85,9 @@ export class AuriaRow<T extends DefaultSchemaData> extends Row<T> {
     }
 
     private applyGetProxiesFromColumn(column: ColumnClass) {
+        if (column.getProxies.length != 0) {
+            console.log("Found column without an empty GET PROXY!", column.name);
+        }
         for (let proxy of column.getProxies) {
             this.addGetProxy(column.schema.get("column_name"), proxy);
         }
@@ -102,8 +119,35 @@ export class AuriaRow<T extends DefaultSchemaData> extends Row<T> {
             });
     }
 
-    public checkUserPermission(user: User, procedure: string, authority?: ProcedureAuthority) {
-        this.systemConnection;
+    public async checkUserPermission(user: User, procedure: string, authority?: ProcedureAuthority): Promise<boolean> {
+        return this.procedurePermission
+            .checkPermissionToExecuteProcedure({
+                entity: this.entity,
+                procedure: procedure,
+                user: user,
+                usingAuthority: authority
+            });
+    }
+
+    public asJSON(keys?: (keyof T)[]): Partial<T> {
+
+        let ret: any = {};
+
+        for (let columnName in this.entity.columns) {
+            let col = this.entity.columns[columnName];
+            let cName = col.schema.get("column_name");
+
+            console.log("AS JSON: column with name:", cName);
+            if (this.get(cName) != null) {
+                ret[cName] = this.get(cName);
+            } else {
+                if (col.schema.get("default_value")) {
+                    ret[cName] = col.schema.get("default_value");
+                }
+            }
+        }
+
+        return ret;
     }
 
 }

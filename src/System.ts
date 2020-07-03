@@ -17,13 +17,14 @@ import { IApiListener } from "./api/IApiListener.js";
 import { SystemConfiguration } from "./SystemConfiguration.js";
 import { ApiRouteMetadata } from "./api/ExposedApiEnpointsMetadata.js";
 import { ApiAccessRule } from "./security/apiAccess/AccessRule.js";
-import { EntitySchema } from "./database/schema/sql/EntitySchema.js";
 import { ISystemRequest } from "./http/ISystemRequest.js";
 import Knex from "knex";
 import { BootSequence } from "./boot/BootSequence.js";
 import { DataRepository } from './data/repository/DataRepository.js';
 import { ConnectionDefinition } from "./database/connection/ConnectionDefinition.js";
 import { EntityClass } from "./entity/EntityClass.js";
+import { ConnectionManager } from "./database/connection/ConnectionManager.js";
+import { ProcedurePermission } from "./security/procedurePermission/ProcedurePermission.js";
 
 export abstract class System extends EventEmitter implements IApiListener {
 
@@ -74,6 +75,7 @@ export abstract class System extends EventEmitter implements IApiListener {
     protected _moduleManager: ModuleManager;
     protected _users: UserManager;
     protected _authenticator: Authenticator;
+    protected _procedurePermission: ProcedurePermission;
     protected _data!: DataRepository;
     protected apiAccessPolicyEnforcer: ApiAccessPolicyEnforcer;
     //if (process.env.NODE_ENV === "development")
@@ -100,6 +102,7 @@ export abstract class System extends EventEmitter implements IApiListener {
         this._moduleManager = new ModuleManager(this);
         this._users = new UserManager(this);
         this._authenticator = new Authenticator(this);
+        this._procedurePermission = new ProcedurePermission(this);
         this._data = new DataRepository(this);
 
         this.apiAccessPolicyEnforcer = new ApiAccessPolicyEnforcer(this);
@@ -113,21 +116,8 @@ export abstract class System extends EventEmitter implements IApiListener {
     public abstract getConnectionDefinition(): ConnectionDefinition;
 
     public getConnection(): Knex {
-
         const definition = this.getConnectionDefinition();
-
-        return Knex({
-            client: definition.client,
-            connection: {
-                driver: definition.client,
-                host: definition.host,
-                user: definition.user,
-                password: definition.password,
-                database: definition.database,
-                port: definition.port,
-
-            }
-        });
+        return ConnectionManager.fromDefinition(definition);
     }
 
     public get name(): string {
@@ -241,6 +231,10 @@ export abstract class System extends EventEmitter implements IApiListener {
 
     public data() {
         return this._data;
+    }
+
+    public procedurePermission(): ProcedurePermission {
+        return this._procedurePermission;
     }
 
     public async install(filterEntity?: string) {

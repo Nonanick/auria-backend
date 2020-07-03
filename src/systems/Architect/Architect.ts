@@ -11,7 +11,6 @@ export class Architect extends System {
     public getConnectionDefinition(): ConnectionDefinition {
         return {
             client: 'mysql2',
-            driver : "mysql",
             host: "localhost",
             port: 3306,
             database: "auria",

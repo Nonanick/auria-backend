@@ -118,8 +118,7 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
             }),
             // Generate an nanoid everytime _id is requested and is null
             getProxies: (value) => {
-                if (value == null)
-                    return nanoid(22);
+                if (value == null) return nanoid(22);
                 return value;
             },
             hooks: {
@@ -276,6 +275,7 @@ export abstract class EntityClass extends EventEmitter implements Bootable {
 
     public row<T extends DefaultSchemaData>(): AuriaRow<T> {
         let row = new AuriaRow<T>(this);
+        row.setConnection(this._connection);
         return row;
     }
 

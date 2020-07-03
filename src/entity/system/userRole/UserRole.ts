@@ -4,7 +4,7 @@ import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
 import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 
 export class UserRole extends EntityClass {
-    
+
     constructor() {
         super(SystemEntityCatalog.UserRole.name);
 
@@ -71,6 +71,30 @@ export class UserRole extends EntityClass {
             // Status
             this.buildDefaultStatusColumn()
         );
+
+        this.addReferences(
+            // Role ID
+            {
+                name: "Role_Associated_With_User",
+                column: "role_id",
+                references: {
+                    column: "_id",
+                    inEntity: SystemEntityCatalog.Role.name,
+                    inTable: SystemEntityCatalog.Role.table_name,
+                }
+            },
+
+            // User ID
+            {
+                name: "User_Is_Assigned_To_Role",
+                column: "user_id",
+                references: {
+                    column: "_id",
+                    inEntity: SystemEntityCatalog.User.name,
+                    inTable: SystemEntityCatalog.User.table_name,
+                }
+            },
+        )
     }
 
     public getBootDependencies(): string[] {

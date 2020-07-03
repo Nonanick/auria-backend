@@ -2,6 +2,7 @@ import { EntityClass } from "../../EntityClass.js";
 import { EntitySchema } from "../../../database/schema/sql/EntitySchema.js";
 import { SystemEntityCatalog } from "../../../database/schema/SystemEntityCatalog.js";
 import { IEntityInfo } from "../../standart/info/IEntityInfo.js";
+import bcrypt from 'bcrypt';
 
 export class User extends EntityClass {
 
@@ -27,6 +28,7 @@ export class User extends EntityClass {
                     status: "active"
                 }
             },
+            
             // Password
             {
                 name: "Password",
@@ -40,8 +42,14 @@ export class User extends EntityClass {
                     nullable: false,
                     status: "active",
                     readable: false
+                },
+                hooks: {
+                    "CREATE": (context) => {
+                        context.procedureData.password = bcrypt.hashSync(context.procedureData.password, 10);
+                    }
                 }
             },
+
             // User Privilege
             {
                 name: "User Privilege",
