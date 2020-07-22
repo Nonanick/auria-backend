@@ -3,10 +3,10 @@ import { EntityClass } from "../../../EntityClass.js";
 import { AuriaRow } from "../../../../database/schema/default/AuriaRow.js";
 import { DefaultSchemaData } from "../../../../database/schemaInterface/default/DefaultSchemaData.js";
 import { EntityProcedureHistory } from "../../../system/index.js";
-import { IEntityProcedureHistory } from "../../../../database/schemaInterface/IEntityActivity.js";
 import { ProcedureAuthority } from "../ProcedureAuthority.js";
 import { ProcedureHistory } from "../ProcedureHistory.js";
 import { IRowProcedure, IRowProcedureParams } from "../row/IRowProcedure.js";
+import { IEntityProcedureHistory } from '../../../../database/schemaInterface/IEntityProcedureHistory.js';
 
 export class CreateProcedureClass implements IRowProcedure {
 
@@ -22,7 +22,7 @@ export class CreateProcedureClass implements IRowProcedure {
         this._resourceEntity = entity;
     }
 
-    public async run<T extends DefaultSchemaData = DefaultSchemaData>(
+    public async run<T = DefaultSchemaData>(
         {
             user,
             entity,
@@ -52,7 +52,7 @@ export class CreateProcedureClass implements IRowProcedure {
             data_procedure: this._name,
             entity_name: entity.auriaRow.get("name"),
             user_id: await user.getId(),
-            extra_information: row.asJSON(),
+            extra_information: JSON.stringify(row.asJSON()),
         });
 
     }

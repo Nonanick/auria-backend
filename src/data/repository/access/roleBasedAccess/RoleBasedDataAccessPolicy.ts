@@ -1,8 +1,8 @@
 import { IDataAccessPolicy } from "../IDataAccessPolicy.js";
 import { QueryBuilder } from "knex";
 import { IDataFilterContext } from "../../../../database/query/IDataFilterContext.js";
-import { IEntityProcedureHistory } from "../../../../database/schemaInterface/IEntityActivity.js";
 import { SystemEntityCatalog } from "../../../../database/schema/SystemEntityCatalog.js";
+import { IEntityProcedureHistory } from '../../../../database/schemaInterface/IEntityProcedureHistory.js';
 
 export class RoleBasedDataAccessPolicy implements IDataAccessPolicy {
 
@@ -38,7 +38,7 @@ export class RoleBasedDataAccessPolicy implements IDataAccessPolicy {
         switch (context.procedure) {
             default:
                 query.whereIn(
-                    context.entity.getPrimaryColumn()?.schema.get("column_name"),
+                    context.entity.getPrimaryColumn()?.schema.column_name!,
                     function () {
                         this.table(SystemEntityCatalog.EntityProcedureHistory.table_name)
                             .select<IEntityProcedureHistory>("entity_row_id")

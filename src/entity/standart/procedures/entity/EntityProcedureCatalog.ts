@@ -1,6 +1,5 @@
-import { IEntityProcedure } from "../IEntityProcedure.js";
 import { ReadFetchProcedure } from "../read/ReadFetchProcedure.js";
-import { CreateProcedure } from "../write/CreateProcedure.js";
+import { IEntityProcedure } from './IEntityProcedure.js';
 
 export const EntityProcedureCatalog = asEntityProcedure({
     "READ_FETCH": ReadFetchProcedure,

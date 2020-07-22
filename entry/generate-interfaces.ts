@@ -117,12 +117,14 @@ getTablesFromConnection(system.getConnection())
                 for (const tsType in tsTypes) {
                     if (tsTypes[tsType].includes(column.type)) {
                         fileContent += `    ${column.name + (column.required ? "" : "?")}:  ${tsType};\n`;
+                        return;
                     }
                 }
+                fileContent += `    ${column.name + (column.required ? "" : "?")}:  any;\n`;
             });
             fileContent += `}`;
 
-            fs.writeFile(path.resolve(generateToFolder, interfaceName + ".ts"), fileContent);
+            await fs.writeFile(path.resolve(generateToFolder, interfaceName + ".ts"), fileContent);
         }
         process.exit(0);
     });

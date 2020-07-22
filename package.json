@@ -13,6 +13,7 @@
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
+    "glob": "^7.1.6",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.1",
     "module-alias": "^2.2.2",
@@ -33,7 +34,7 @@
   },
   "scripts": {
     "test": "mocha",
-    "server": "nodemon --delay 2 --exec node ./entry/express.js",
+    "server": "nodemon --delay 2 --trace-warnings --exec node --trace-warnings ./entry/express.js",
     "install-db": "node ./entry/install.js --system Architect"
   },
   "keywords": [

@@ -20,7 +20,7 @@ export class ReadFetchProcedureClass implements IEntityProcedure {
 
     public async run({ user , entity, using, useTransaction }: IEntityProcedureParams) {
 
-        const query = entity.connection.table(entity.schema.get("table_name"));
+        const query = entity.connection.table(entity.schema.table_name);
 
         const params : ReadFetchParameters = using;
 

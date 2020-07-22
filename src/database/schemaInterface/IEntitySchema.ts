@@ -1,7 +1,5 @@
-import { ConnectionDefinition } from "../connection/ConnectionDefinition.js";
-
 export interface IEntitySchema {
     table_name: string;
-    connection?: number | ConnectionDefinition;
+    connection?: string;
     is_system_entity? : boolean;
 }

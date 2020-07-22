@@ -7,5 +7,6 @@ export interface IAuriaConnection {
     database:  string;
     username:  string;
     password:  string;
+    port:  number;
     status:  string;
 }

@@ -8,4 +8,5 @@ export interface IConnection extends DefaultSchemaData {
     database: string;
     username: string;
     password: string;
+    port : number;
 }

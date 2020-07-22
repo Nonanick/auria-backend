@@ -7,11 +7,11 @@ export interface IColumn extends DefaultSchemaData {
     name: string;
     column_name: string;
     title: string;
-    description: string;
+    description?: string;
     sql_type: SQLTypes;
-    length: number;
-    data_type: string;
-    default_value: any;
+    length?: number;
+    data_type?: string;
+    default_value?: any;
     nullable: boolean;
     column_keys: ("UNI" | "IND" | "PRI")[];
     readable? : boolean;

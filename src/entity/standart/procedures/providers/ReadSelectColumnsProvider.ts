@@ -20,13 +20,13 @@ class ReadSelectColumnsProviderClass implements IDataFieldsProvider {
             return this.getColumnNamesFromEntity(
                 entity,
                 // Matches Column Name OR Name
-                (col) => col.schema.get("column_name") === fields || col.name === fields);
+                (col) => col.schema.column_name === fields || col.name === fields);
         }
         else {
             return this.getColumnNamesFromEntity(
                 entity,
                 // Should probably filter for readable!
-                (col) => fields.includes(col.schema.get("column_name")) || fields.includes(col.name));
+                (col) => fields.includes(col.schema.column_name) || fields.includes(col.name));
         }
     }
 
@@ -37,7 +37,7 @@ class ReadSelectColumnsProviderClass implements IDataFieldsProvider {
             columns = columns.filter(filter);
         }
 
-        return columns.map(c => c.schema.get("column_name"));
+        return columns.map(c => c.schema.column_name);
 
     }
 }

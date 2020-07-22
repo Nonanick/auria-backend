@@ -5,13 +5,13 @@ import { InvalidEntityProcedure } from "../../../exception/system/database/Inval
 import { Row } from "../../Row.js";
 import { User } from "../../../user/User.js";
 import { ProcedureAuthority } from "../../../entity/standart/procedures/ProcedureAuthority.js";
-import { IEntityProcedureHook } from "../../../entity/standart/procedures/IEntityProcedureHook.js";
-import { ProcedureHookContext } from "../../../entity/standart/procedures/ProcedureHookContext.js";
 import { ProcedurePermission } from "../../../security/procedurePermission/ProcedurePermission.js";
 import { RowProcedureCatalog } from "../../../entity/standart/procedures/row/RowProcedureCatalog.js";
 import { UserUnauthorizedToExecuteProcedure } from "../../../exception/system/security/UserUnauthorizedToExecuteProcedure.js";
+import { IEntityProcedureHook } from '../../../entity/standart/procedures/entity/IEntityProcedureHook.js';
+import { ProcedureHookContext } from '../../../entity/standart/procedures/ProcedureHookContext.js';
 
-export class AuriaRow<T extends DefaultSchemaData> extends Row<T> {
+export class AuriaRow<T> extends Row<T> {
 
     protected procedurePermission!: ProcedurePermission;
 
@@ -24,7 +24,7 @@ export class AuriaRow<T extends DefaultSchemaData> extends Row<T> {
     constructor(entity: EntityClass, data?: Partial<T>) {
         super(data);
         this.entity = entity;
-        this.setTableName(entity.schema.get("table_name"));
+        this.setTableName(entity.schema.table_name);
         this.setRowState("NOT_ON_DATABASE");
        // console.log("[---------- Apply entity rules!", entity);
         this.applyEntityRules(entity);
@@ -89,13 +89,13 @@ export class AuriaRow<T extends DefaultSchemaData> extends Row<T> {
             console.log("Found column without an empty GET PROXY!", column.name);
         }
         for (let proxy of column.getProxies) {
-            this.addGetProxy(column.schema.get("column_name"), proxy);
+            this.addGetProxy(column.schema.column_name as keyof T, proxy);
         }
     }
 
     private applySetProxiesFromColumn(column: ColumnClass) {
         for (let proxy of column.setProxies) {
-            this.addSetProxy(column.schema.get("column_name"), proxy);
+            this.addSetProxy(column.schema.column_name as keyof T, proxy);
         }
     }
 
@@ -104,7 +104,7 @@ export class AuriaRow<T extends DefaultSchemaData> extends Row<T> {
 
         return this.connection
             .select<T[]>('*')
-            .from(this.entity.schema.get("table_name"))
+            .from(this.entity.schema.table_name)
             .where(searchColumn as string, id)
             .then((res) => {
                 if (res.length === 1) {
@@ -112,7 +112,7 @@ export class AuriaRow<T extends DefaultSchemaData> extends Row<T> {
                     this.setRowState("SYNCED");
                 }
                 else {
-                    console.error("[AuriaRow] Failed to pinpoint row with id ", id, ' in Table ', this.entity.schema.get("table_name"), ' searched in column ', column);
+                    console.error("[AuriaRow] Failed to pinpoint row with id ", id, ' in Table ', this.entity.schema.table_name, ' searched in column ', column);
                 }
 
                 return this;
@@ -135,14 +135,14 @@ export class AuriaRow<T extends DefaultSchemaData> extends Row<T> {
 
         for (let columnName in this.entity.columns) {
             let col = this.entity.columns[columnName];
-            let cName = col.schema.get("column_name");
+            let cName = col.schema.column_name as keyof T;
 
             console.log("AS JSON: column with name:", cName);
             if (this.get(cName) != null) {
                 ret[cName] = this.get(cName);
             } else {
-                if (col.schema.get("default_value")) {
-                    ret[cName] = col.schema.get("default_value");
+                if (col.schema.default_value) {
+                    ret[cName] = col.schema.default_value;
                 }
             }
         }

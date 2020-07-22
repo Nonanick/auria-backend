@@ -1,35 +1,23 @@
-import { ApiAccess } from "./apiAccess/ApiAccess.js";
-import { Connection } from "./connection/Connection.js";
-import { ColumnEntityInstance } from './column/ColumnEntityInstance.js';
-import { EntityInstance } from "./entity/EntityInstance.js";
-import { EntityProcedureHistory } from "./entityProcedureHistory/EntityProcedureHistory.js";
-import { ReferenceInstance } from "./reference/ReferenceInstance.js";
-import { Module } from "./module/Module.js";
-import { ModulePage } from "./modulePage/ModulePage.js";
-import { ModuleMenu } from "./moduleMenu/ModuleMenu.js";
-import { PersistentLogin } from "./persistentLogin/PersistentLogin.js";
-import { Role } from "./role/Role.js";
-import { User } from "./user/User.js";
-import { UserRole } from "./userRole/UserRole.js";
-import { UserInfo } from "./userInfo/UserInfo.js";
-import { EntityRowAccessShare } from "./entityRowAccessShare/EntityRowAccessShare.js";
-import { EntityProcedurePermission } from "./entityProcedurePermission/EntityProcedurePermission.js";
-
-export { 
-    ApiAccess, 
-    Connection, 
-    ColumnEntityInstance,
-    EntityInstance, 
-    EntityProcedureHistory,
-    EntityProcedurePermission,
-    EntityRowAccessShare,
-    ReferenceInstance,
-    Module,
-    ModulePage,
-    ModuleMenu,
-    PersistentLogin,
-    Role, 
-    User,
-    UserInfo,
-    UserRole,
-};
+export { ApiAccess } from './apiAccess/ApiAccess.js';
+export { ColumnEntityInstance } from './column/ColumnEntityInstance.js';
+export { ColumnProxy } from './columnProxy/ColumnProxy.js';
+export { ColumnValidation } from './columnValidation/ColumnValidation.js';
+export { Connection } from './connection/Connection.js';
+export { EntityInstance } from './entity/EntityInstance.js';
+export { EntityFacade } from './entityFacade/EntityFacade.js';
+export { EntityProcedureHistory } from './entityProcedureHistory/EntityProcedureHistory.js';
+export { EntityProcedurePermission } from './entityProcedurePermission/EntityProcedurePermission.js';
+export { EntityRowAccessShare } from './entityRowAccessShare/EntityRowAccessShare.js';
+export { Module } from './module/Module.js';
+export { ModuleMenu } from './moduleMenu/ModuleMenu.js';
+export { ModulePage } from './modulePage/ModulePage.js';
+export { ModulePagePermission } from './modulePagePermission/ModulePagePermission.js';
+export { PersistentLogin } from './persistentLogin/PersistentLogin.js';
+export { Proxy } from './proxy/Proxy.js';
+export { ReferenceInstance } from './reference/ReferenceInstance.js';
+export { Role } from './role/Role.js';
+export { SystemEntities } from './SystemEntities.js';
+export { User } from './user/User.js';
+export { UserInfo } from './userInfo/UserInfo.js';
+export { UserRole } from './userRole/UserRole.js';
+export { Validation } from './validation/Validation.js';

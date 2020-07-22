@@ -34,7 +34,7 @@ class ReadOrderResultsProviderClass implements IDataOrderProvider {
     protected columnExists(columns: ColumnClass[], column: string): boolean {
         return columns
             .filter(
-                (c) => c.name === column || c.schema.get("column_name") === column
+                (c) => c.name === column || c.schema.column_name === column
             ).length > 0;
     }
 

@@ -7,6 +7,18 @@ export const SystemEntityCatalog = {
         name : "Auria_Column",
         table_name : "auria_column"
     },
+    ColumnProxy : {
+      name : 'Auria_Column_Proxy',
+      table_name : 'auria_column_proxy'
+    },
+    ColumnValidation : {
+      name : "Auria_Column_Validation",
+      table_name : "auria_column_validation"
+    },
+    Validation : {
+      name : 'Auria_Validation',
+      table_name : 'auria_validation'
+    },
     Reference : {
         name : "Auria_Entity_Reference",
         table_name : "auria_entity_reference"
@@ -30,6 +42,10 @@ export const SystemEntityCatalog = {
     ModulePage : {
         name : "Auria_Module_Page",
         table_name : "auria_module_page"
+    },
+    EntityFacade : {
+      name : "Auria_Entity_Facade",
+      table_name : 'auria_entity_facade'
     },
     EntityProcedurePermission : {
         name : "Auria_Entity_Procedure_Permission",
@@ -58,6 +74,10 @@ export const SystemEntityCatalog = {
     UserRole : {
         name : "Auria_User_Role",
         table_name : "auria_user_role"
+    },
+    Proxy : {
+      name : 'Auria_Proxy',
+      table_name : 'auria_proxy',
     },
     Role : {
         name : "Auria_Role",

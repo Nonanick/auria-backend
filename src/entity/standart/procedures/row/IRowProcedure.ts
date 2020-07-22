@@ -5,7 +5,7 @@ import { Row } from "../../../../database/Row.js";
 import { DefaultSchemaData } from "../../../../database/schemaInterface/default/DefaultSchemaData.js";
 import { ProcedureAuthority } from "../ProcedureAuthority.js";
 
-export interface IRowProcedureParams<T extends DefaultSchemaData = any> {
+export interface IRowProcedureParams<T = any> {
     user: User;
     entity: EntityClass;
     row: Row<T>;

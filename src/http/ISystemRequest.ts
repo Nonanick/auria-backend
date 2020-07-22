@@ -1,52 +1,50 @@
 import { User } from "../user/User.js";
 
-export interface ISystemRequest {
+export interface ISystemRequest<T = any> {
+  /**
+   * Full URL
+   * --------
+   * API Url requested WITH queryString attached
+   */
+  fullUrl: string;
 
-    /**
-     * Full URL
-     * --------
-     * API Url requested WITH queryString attached
-     */
-    fullUrl: string;
+  /**
+   * URL
+   * ----
+   * API Requested url, must match an ApiEndpoint URL
+   */
+  url: string;
 
-    /**
-     * URL
-     * ----
-     * API Requested url, must match an ApiEndpoint URL
-     */
-    url: string;
+  /**
+   *
+   */
+  queryString: string;
 
-    /**
-     * 
-     */
-    queryString: string;
+  resolvedQueryString: {
+    [parameter: string]: any;
+  };
 
-    resolvedQueryString: {
-        [parameter: string]: any
-    };
+  parameters: T;
 
-    parameters: any;
+  /**
+   * State Parameters
+   * -----------------
+   *
+   */
+  headers: { [name: string]: string | string[] };
 
-    /**
-     * State Parameters
-     * -----------------
-     * 
-     */
-    headers: { [name: string]: string | string[] };
+  cookies: { [name: string]: string };
 
-    cookies: { [name: string]: string };
+  /**
+   * System Name
+   * ------------
+   * System this request was made to
+   */
+  system: string;
 
-    /**
-     * System Name
-     * ------------
-     * System this request was made to
-     */
-    system: string;
+  redirected: false;
 
-    redirected: false;
+  referer: string;
 
-    referer : string;
-
-    getUser(): User | undefined;
-
+  getUser(): User | undefined;
 }
