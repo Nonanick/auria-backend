@@ -1,1 +1,0 @@
-export type IGetProxy = <T = any|string>(value: T|string) => T|string | Promise<T|string>; 

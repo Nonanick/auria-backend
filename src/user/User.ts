@@ -1,5 +1,4 @@
 import { System } from "../System.js";
-import { AuriaRow } from "../database/schema/default/AuriaRow.js";
 import { UserAuthentication } from "./auth/UserAuthentication.js";
 import { Bootable } from "../boot/Bootable.js";
 import { SystemEntityCatalog } from "../database/schema/SystemEntityCatalog.js";
@@ -90,8 +89,6 @@ export class User extends EventEmitter implements Bootable {
     public auth(): UserAuthentication {
         return this._auth;
     }
-
-    protected info!: AuriaRow<IUserInfo>;
 
 
     constructor(system: System, username: string) {

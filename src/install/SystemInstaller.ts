@@ -33,6 +33,7 @@ export class SystemInstaller {
   }
 
   async installEntitySchema(entity: EntityClass) {
+    console.log('\n[Installer] Will now install schema of entity:', entity.name);
     // Install Table schema already fires column installation ( CREATE cannot be done in 2 queries!);
     return entity.schema.install(this._system.getConnection());
   }

@@ -1,0 +1,1 @@
+export type AcceptedDefaultValueTypes = string | number | Date | boolean;

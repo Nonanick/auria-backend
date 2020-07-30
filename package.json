@@ -8,6 +8,7 @@
     "test": "tests"
   },
   "dependencies": {
+    "auria-data": "link:..\\data",
     "auria-lib": "link:..\\auria-libs",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",

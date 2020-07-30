@@ -28,8 +28,6 @@ let installer = new SystemInstaller(
   SystemCatalog[systemName as keyof typeof SystemCatalog]
 );
 
-console.log('Installer!', installer);
-
 let p = new Promise(async (resolve, reject) => {
   try {
     // First install schema

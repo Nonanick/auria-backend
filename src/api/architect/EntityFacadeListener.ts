@@ -45,7 +45,7 @@ export class EntityFacadeListener extends SystemApiListener {
       .getConnection()
       .select("*")
       .from(SystemEntityCatalog.EntityFacade.table_name)
-      .where("entity", req.parameters.entity)
+      .where("entity_name", req.parameters.entity)
       .then((res) => {
         return res;
       });
@@ -56,7 +56,7 @@ export class EntityFacadeListener extends SystemApiListener {
       .getConnection()
       .select("*")
       .from(SystemEntityCatalog.EntityFacade.table_name)
-      .where("entity", req.parameters.entity)
+      .where("entity_name", req.parameters.entity)
       .where("name", req.parameters.facade)
       .then((res) => {
         return res[0];
