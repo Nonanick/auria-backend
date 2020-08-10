@@ -6,7 +6,6 @@ import jwt from 'jsonwebtoken';
 import { IApiListener } from "../../IApiListener.js";
 import { System } from "../../../System.js";
 import { ExposedApiRoutesMetadata } from "../../ExposedApiEnpointsMetadata.js";
-import { BooleanSanitizer } from "../../../data/sanitizer/BooleanSanitizer.js";
 import { SystemApiListener } from "../SystemApiListener.js";
 import { LoginAttemptDenied } from "../../../exception/system/authentication/LoginAttemptDenied.js";
 import { LoginAttemptManager } from "../../../security/authentication/loginAttempt/LoginAttemptManager.js";
